@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <cassert>
 
 Lexer::Lexer(const char *const data)
     : data(data), pos(data), good(true), current('\0') {}
@@ -69,4 +70,27 @@ Lexer::TokenType Lexer::readAtom() {
 const char *Lexer::string() {
   buffer.emplace_back('\0');
   return buffer.data();
+}
+
+const char* Lexer::TokenToCString(const TokenType& tokenType) {
+  switch (tokenType) {
+  case TokenType::NONE:
+    return "NONE";
+  case TokenType::TOKEN_EOF:
+    return "TOKEN_EOF";
+  case TokenType::START_PAREN:
+    return "START_PAREN";
+  case TokenType::END_PAREN:
+    return "END_PAREN";
+  case TokenType::SYMBOL:
+    return "SYMBOL";
+  case TokenType::STRING:
+    return "STRING";
+  case TokenType::INTEGER:
+    return "INTEGER";
+  case TokenType::FLOAT:
+    return "FLOAT";
+  }
+  assert(false);
+  return "OH NOES";
 }

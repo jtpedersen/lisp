@@ -21,6 +21,7 @@ public:
   /// The value of a string
   const char *string();
 
+  static const char* TokenToCString(const TokenType& tokenType);
 private:
   const char *data;
   const char *pos;
