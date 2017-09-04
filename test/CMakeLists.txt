@@ -1,10 +1,10 @@
-find_package(PkgConfig)
-pkg_check_modules(GTEST REQUIRED gtest>=1.7.0)
-pkg_check_modules(GMOCK REQUIRED gmock>=1.7.0)
+include_directories(../ src)
 
-include_directories(
-    ${GTEST_INCLUDE_DIRS}
-    ${GMOCK_INCLUDE_DIRS}
-    )
-  
-INCLUDE_DIRECTORIES(../src)
+macro(TESTCASE casename)
+add_executable(${casename} ${ARGN})
+#Link test executable against gtest &gtest_main
+target_link_libraries(${casename} gtest gmock)
+add_test(${casename} ${casename})
+endmacro(TESTCASE)
+
+TESTCASE(frist frist.cpp)

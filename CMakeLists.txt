@@ -8,6 +8,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 14)
 
 add_subdirectory(src)
+add_subdirectory(googletest)
+
+enable_testing()
 add_subdirectory(test)
 
 
