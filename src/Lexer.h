@@ -15,7 +15,7 @@ public:
     INTEGER,
     FLOAT
   };
-  Lexer(const char *const data, int dataSize);
+  Lexer(const char *const data);
   TokenType nextToken();
 
   /// The value of a string
@@ -23,9 +23,12 @@ public:
 
 private:
   const char *data;
-  int dataSize;
   const char *pos;
+  char current;
   bool good;
+
+  TokenType readString();
+  TokenType readAtom(char c);
 
   std::vector<char> buffer;
   char nextChar();
