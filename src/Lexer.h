@@ -15,11 +15,11 @@ public:
     INTEGER,
     FLOAT
   };
-  Lexer(const char *const data);
+  explicit Lexer(const char *const data);
   TokenType nextToken();
 
   /// The value of a string
-  const char *const string();
+  const char *string();
 
 private:
   const char *data;
@@ -28,10 +28,10 @@ private:
   bool good;
 
   TokenType readString();
-  TokenType readAtom(char c);
+  TokenType readAtom();
 
   std::vector<char> buffer;
-  char nextChar();
+  bool nextChar();
 };
 
 #endif /* !LEXER_H_ */

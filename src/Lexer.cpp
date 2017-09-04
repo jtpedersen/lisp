@@ -3,14 +3,15 @@
 #include <stdio.h>
 #include <string.h>
 
-Lexer::Lexer(const char *const data) : data(data), pos(data), good(true) {}
+Lexer::Lexer(const char *const data)
+    : data(data), pos(data), good(true), current('\0') {}
 
 Lexer::TokenType Lexer::nextToken() {
-  auto c = nextChar();
+  nextChar();
   if (!good)
     return TokenType::TOKEN_EOF;
   // printf("c %c\n", c);
-  switch (c) {
+  switch (current) {
   case '\0':
     return TokenType::TOKEN_EOF;
   case '(':
@@ -20,56 +21,52 @@ Lexer::TokenType Lexer::nextToken() {
   case '"':
     return readString();
   default:
-    return readAtom(c);
+    return readAtom();
   }
 
   return TokenType::NONE;
 }
 
-char Lexer::nextChar() {
-  const auto ret = *pos++;
-  if ('\0' == ret) {
+bool Lexer::nextChar() {
+  current = *pos++;
+  if ('\0' == current) {
     good = false;
   }
-  return ret;
+  return good;
 }
 
 Lexer::TokenType Lexer::readString() {
   buffer.clear();
   bool escape = false;
-  while (auto c = nextChar()) {
-    if (!good)
-      return TokenType::TOKEN_EOF;
-    //      printf("c %c\n", c);
-    if ('\\' == c) {
+  while (nextChar()) {
+    if ('\\' == current) {
       escape = true;
       continue;
     }
 
-    if (!escape && '"' == c) {
+    if (!escape && '"' == current) {
       break;
     }
 
     escape = false;
-    buffer.emplace_back(c);
+    buffer.emplace_back(current);
   }
-  return TokenType::STRING;
+  return good ? TokenType::STRING : TokenType::TOKEN_EOF;
+  ;
 }
 
-Lexer::TokenType Lexer::readAtom(char c) {
+Lexer::TokenType Lexer::readAtom() {
   buffer.clear();
   do {
-    if (!good)
-      return TokenType::TOKEN_EOF;
-    //      printf("c %c\n", c);
-    if (!isalnum(c)) {
+    if (!isalnum(current)) {
       break;
     }
-    buffer.emplace_back(c);
-  } while (c = nextChar());
+    buffer.emplace_back(current);
+  } while (nextChar());
   return TokenType::SYMBOL;
 }
-const char *const Lexer::string() {
+
+const char *Lexer::string() {
   buffer.emplace_back('\0');
   return buffer.data();
 }
