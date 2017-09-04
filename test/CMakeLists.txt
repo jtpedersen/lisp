@@ -1,4 +1,4 @@
-include_directories(../ src)
+include_directories(../src)
 
 macro(TESTCASE casename)
 add_executable(${casename} ${ARGN})
@@ -8,3 +8,5 @@ add_test(${casename} ${casename})
 endmacro(TESTCASE)
 
 TESTCASE(frist frist.cpp)
+
+TESTCASE(lexer Lexer.cpp ../src/Lexer.cpp)
