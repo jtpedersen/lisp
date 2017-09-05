@@ -71,6 +71,25 @@ TEST(lexer, SymbolList) {
   ASSERT_EQ(Lexer::TokenType::TOKEN_EOF, l.nextToken());
 }
 
+TEST(lexer, integer) {
+  const auto str = "123";
+  Lexer l(str);
+  ASSERT_EQ(Lexer::TokenType::INTEGER, l.nextToken());
+  ASSERT_STREQ(l.string(), "123");
+  ASSERT_EQ(l.integer(), 123);
+  ASSERT_EQ(Lexer::TokenType::TOKEN_EOF, l.nextToken());
+}
+
+TEST(lexer, negativeInteger) {
+  const auto str = "-123";
+  Lexer l(str);
+  ASSERT_EQ(Lexer::TokenType::INTEGER, l.nextToken());
+  ASSERT_STREQ(l.string(), "-123");
+  ASSERT_EQ(l.integer(), -123);
+  ASSERT_EQ(Lexer::TokenType::TOKEN_EOF, l.nextToken());
+}
+
+
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

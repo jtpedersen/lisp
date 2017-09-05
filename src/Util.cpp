@@ -28,4 +28,8 @@ ostream &operator<<(ostream &os, const Lexer::TokenType &t) {
   return os << Lexer::TokenToCString(t);
 }
 
+ostream &operator<<(ostream &os, const AST::Type &t) {
+  return os << AST::TypeToCString(t);
+}
+
 } // std

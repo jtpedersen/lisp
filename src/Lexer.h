@@ -20,6 +20,8 @@ public:
 
   /// The value of a string
   const char *string();
+  /// The Value as Integer
+  int integer();
 
   static const char* TokenToCString(const TokenType& tokenType);
 private:

@@ -1,8 +1,9 @@
 #include "Lexer.h"
+#include <cassert>
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <cassert>
+#include <stdlib.h>
 
 Lexer::Lexer(const char *const data)
     : data(data), pos(data), good(true), current('\0') {}
@@ -58,13 +59,14 @@ Lexer::TokenType Lexer::readString() {
 
 Lexer::TokenType Lexer::readAtom() {
   buffer.clear();
+  const auto ret = (isdigit(current) || '-' == current) ? TokenType::INTEGER : TokenType::SYMBOL;
   do {
-    if (!isalnum(current)) {
+    if (!isalnum(current) && '-' != current) {
       break;
     }
     buffer.emplace_back(current);
   } while (nextChar());
-  return TokenType::SYMBOL;
+  return ret;
 }
 
 const char *Lexer::string() {
@@ -72,7 +74,11 @@ const char *Lexer::string() {
   return buffer.data();
 }
 
-const char* Lexer::TokenToCString(const TokenType& tokenType) {
+int Lexer::integer() {
+  return atoi(string());
+}
+
+const char *Lexer::TokenToCString(const TokenType &tokenType) {
   switch (tokenType) {
   case TokenType::NONE:
     return "NONE";

@@ -10,3 +10,5 @@ endmacro(TESTCASE)
 TESTCASE(frist frist.cpp)
 
 TESTCASE(lexer Lexer.cpp ../src/Lexer.cpp)
+
+TESTCASE(parser Parser.cpp ../src/Lexer.cpp ../src/Parser.cpp ../src/Util.cpp)

@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Lexer.h"
+#include "AST.h"
 
 /// helping utilites
 namespace util {
@@ -15,6 +16,7 @@ std::vector<Lexer::TokenType> tokenizeFile(std::string file);
 namespace std {
 
 ostream &operator<<(ostream &os, const Lexer::TokenType &t);
+ostream &operator<<(ostream &os, const AST::Type &t);
 
 } // std
 
