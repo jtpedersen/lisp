@@ -23,12 +23,17 @@ public:
   /// The Value as Integer
   int integer();
 
+  /// Current line in src
+  int line() const;
+  int col() const;
+
   static const char* TokenToCString(const TokenType& tokenType);
 private:
   const char *data;
   const char *pos;
   char current;
   bool good;
+  int line_, col_;
 
   TokenType readString();
   TokenType readAtom();

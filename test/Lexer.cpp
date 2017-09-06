@@ -90,6 +90,25 @@ TEST(lexer, negativeInteger) {
 }
 
 
+TEST(lexer, location) {
+  const auto str = "1";
+  Lexer l(str);
+  ASSERT_EQ(Lexer::TokenType::INTEGER, l.nextToken());
+  EXPECT_EQ(l.line(), 1);
+  EXPECT_EQ(l.col(), 1);
+}
+
+TEST(lexer, colAdvance) {
+  const auto str = "1 1";
+  Lexer l(str);
+  ASSERT_EQ(Lexer::TokenType::INTEGER, l.nextToken());
+  EXPECT_EQ(l.line(), 1);
+  EXPECT_EQ(l.col(), 1);
+  ASSERT_EQ(Lexer::TokenType::INTEGER, l.nextToken());
+  EXPECT_EQ(l.col(), 3);
+}
+
+
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

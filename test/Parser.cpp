@@ -16,8 +16,7 @@ TEST(parser, minimal) {
 TEST(parser, symbol) {
   Lexer l("hest");
   Parser p(l);
-  const auto ast = p.read();
-  ASSERT_EQ(AST::Type::SYMBOL, ast->type()) << ast->type();
+  ASSERT_THROW(p.read(), SyntaxError);
 }
 
 

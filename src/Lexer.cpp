@@ -2,11 +2,11 @@
 #include <cassert>
 #include <ctype.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 Lexer::Lexer(const char *const data)
-    : data(data), pos(data), good(true), current('\0') {}
+    : data(data), pos(data), good(true), current('\0'), line_(0), col_(0) {}
 
 Lexer::TokenType Lexer::nextToken() {
   nextChar();
@@ -34,6 +34,13 @@ bool Lexer::nextChar() {
   if ('\0' == current) {
     good = false;
   }
+  if ('\n' == current) {
+    line_++;
+    col_ = 1;
+  } else {
+    col_++;
+  }
+
   return good;
 }
 
@@ -59,7 +66,8 @@ Lexer::TokenType Lexer::readString() {
 
 Lexer::TokenType Lexer::readAtom() {
   buffer.clear();
-  const auto ret = (isdigit(current) || '-' == current) ? TokenType::INTEGER : TokenType::SYMBOL;
+  const auto ret = (isdigit(current) || '-' == current) ? TokenType::INTEGER
+                                                        : TokenType::SYMBOL;
   do {
     if (!isalnum(current) && '-' != current) {
       break;
@@ -74,9 +82,7 @@ const char *Lexer::string() {
   return buffer.data();
 }
 
-int Lexer::integer() {
-  return atoi(string());
-}
+int Lexer::integer() { return atoi(string()); }
 
 const char *Lexer::TokenToCString(const TokenType &tokenType) {
   switch (tokenType) {
@@ -99,4 +105,14 @@ const char *Lexer::TokenToCString(const TokenType &tokenType) {
   }
   assert(false);
   return "OH NOES";
+}
+
+int Lexer::line() const {
+  // zero indexed
+  return line_ + 1;
+}
+
+int Lexer::col() const {
+  // the pointer is after what was read
+  return col_ - 1;
 }
