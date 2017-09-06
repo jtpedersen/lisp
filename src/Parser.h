@@ -6,6 +6,15 @@
 #include <memory>
 #include <exception>
 
+
+  // "                                          \
+  //   number : /-?[0-9]+/ ;                    \
+  //   symbol : 'identifer'
+  //   sexpr  : '(' <expr>* ')' ;               \
+  //   expr   : <number> | <symbol> | <sexpr> ; \
+  //   lispy  : /^/ <expr>* /$/ ;               \
+  // ",
+
 class SyntaxError : public std::exception {
 public:
   SyntaxError(const char *what, int line, int col);
@@ -26,7 +35,9 @@ public:
 private:
   Lexer lexer;
 
+  void syntaxError(const char *msg);
   std::shared_ptr<AST> readSexpr();
+  std::shared_ptr<AST> readExpr();
 };
 
 #endif /* !PARSER_H_ */

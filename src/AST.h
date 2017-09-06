@@ -20,8 +20,13 @@ public:
   void setChildren(std::vector<std::shared_ptr<AST>> children) {
     children_ = children;
   }
-
+  void addChild(std::shared_ptr<AST> child) { children_.push_back(child); }
   std::vector<std::shared_ptr<AST>> children() { return children_; }
+
+  std::shared_ptr<AST> &operator[](std::size_t idx) { return children_[idx]; }
+  const std::shared_ptr<AST> &operator[](std::size_t idx) const {
+    return children_[idx];
+  }
 
   static const char *TypeToCString(Type t) {
     switch (t) {

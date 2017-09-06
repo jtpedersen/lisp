@@ -1,5 +1,7 @@
 #include "Parser.h"
+#include "Util.h"
 #include <cassert>
+#include <iostream>
 #include <stdlib.h>
 #include <string.h>
 
@@ -19,25 +21,32 @@ Parser::Parser(const Lexer &lexer) : lexer(lexer) {}
 std::shared_ptr<AST> Parser::read() { return readSexpr(); }
 
 std::shared_ptr<AST> Parser::readSexpr() {
-  const auto tokenType = lexer.nextToken();
+  auto tokenType = lexer.nextToken();
   if (TokenType::START_PAREN != tokenType) {
-    throw SyntaxError("Expected Sexpr start", lexer.line(), lexer.col());
+    syntaxError("Expected Sexpr start");
   }
-  return std::make_shared<ASTSexpr>();
 
-  // switch (tokenType) {
+  auto ret = std::make_shared<ASTSexpr>();
+  while (const auto child = readExpr()) {
+    std::cout << "Adding child: " << child->type() << std::endl;
+    ret->addChild(child);
+  }
+  return ret;
+}
 
-  // case TokenType::SYMBOL:
-  //   return std::make_shared<ASTSymbol>(lexer.string());
-  // case TokenType::NONE:
-  // case TokenType::TOKEN_EOF:
-  // case TokenType::END_PAREN:
-  // case TokenType::STRING:
-  // case TokenType::INTEGER:
-  // case TokenType::FLOAT:
-  //   break;
-  // }
-  // assert(false);
+std::shared_ptr<AST> Parser::readExpr() {
+  const auto tokenType = lexer.nextToken();
+  std::cout << "Read token: " << tokenType << std::endl;
+  if (TokenType::SYMBOL == tokenType) {
+    return std::make_shared<ASTSymbol>(lexer.string());
+  } else if (TokenType::INTEGER == tokenType) {
+    return std::make_shared<ASTInt>(lexer.integer());
+  } else if (TokenType::END_PAREN == tokenType) {
+    return nullptr;
+  }
+  syntaxError("Expected expression");
+}
 
-  // return nullptr;
+void Parser::syntaxError(const char *msg) {
+  throw SyntaxError(msg, lexer.line(), lexer.col());
 }
