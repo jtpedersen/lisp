@@ -50,6 +50,35 @@ TEST(parser, symbolAndInteger) {
   EXPECT_EQ(AST::Type::INTEGER, (*ast)[1]->type()) << (*ast)[1]->type();
 }
 
+TEST(parser, nestedSexpr) {
+  Lexer l("( () () )");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_NE(ast, nullptr);
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_EQ(ast->children().size(), 2);
+  EXPECT_EQ(AST::Type::SEXPR, (*ast)[0]->type()) << (*ast)[0]->type();
+  EXPECT_EQ(AST::Type::SEXPR, (*ast)[1]->type()) << (*ast)[1]->type();
+}
+
+TEST(parser, multinestedSexpr) {
+  Lexer l("(((())))");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_NE(ast, nullptr);
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_EQ(ast->children().size(), 1);
+  EXPECT_EQ(AST::Type::SEXPR, (*ast)[0]->type()) << (*ast)[0]->type();
+}
+
+TEST(parser, unbalanced) {
+  Lexer l("(((()))");
+  Parser p(l);
+  ASSERT_THROW(p.read(), SyntaxError);
+}
+
+
+
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

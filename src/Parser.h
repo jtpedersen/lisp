@@ -3,14 +3,13 @@
 #include "AST.h"
 #include "Lexer.h"
 
-#include <memory>
 #include <exception>
+#include <memory>
 
-
-  // "                                          \
+// "                                          \
   //   number : /-?[0-9]+/ ;                    \
   //   symbol : 'identifer'
-  //   sexpr  : '(' <expr>* ')' ;               \
+//   sexpr  : '(' <expr>* ')' ;               \
   //   expr   : <number> | <symbol> | <sexpr> ; \
   //   lispy  : /^/ <expr>* /$/ ;               \
   // ",
@@ -20,6 +19,7 @@ public:
   SyntaxError(const char *what, int line, int col);
 
   const char *what() const noexcept override;
+
 private:
   const char *msg;
   int line;
