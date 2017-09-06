@@ -27,7 +27,8 @@ public:
   int line() const;
   int col() const;
 
-  static const char* TokenToCString(const TokenType& tokenType);
+  static const char *TokenToCString(const TokenType &tokenType);
+
 private:
   const char *data;
   const char *pos;
@@ -40,6 +41,8 @@ private:
 
   std::vector<char> buffer;
   bool nextChar();
+  char peek() const;
+  bool isparen(char c) const;
 };
 
 #endif /* !LEXER_H_ */

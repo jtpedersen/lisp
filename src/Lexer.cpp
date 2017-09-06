@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
 
 Lexer::Lexer(const char *const data)
     : data(data), pos(data), good(true), current('\0'), line_(0), col_(0) {}
@@ -12,6 +13,7 @@ Lexer::TokenType Lexer::nextToken() {
   nextChar();
   if (!good)
     return TokenType::TOKEN_EOF;
+  if (isspace(current)) return nextToken();
   // printf("c %c\n", c);
   switch (current) {
   case '\0':
@@ -40,9 +42,10 @@ bool Lexer::nextChar() {
   } else {
     col_++;
   }
-
   return good;
 }
+
+char Lexer::peek() const { return *(pos); }
 
 Lexer::TokenType Lexer::readString() {
   buffer.clear();
@@ -73,9 +76,13 @@ Lexer::TokenType Lexer::readAtom() {
       break;
     }
     buffer.emplace_back(current);
+    if (isparen(peek()))
+      break;
   } while (nextChar());
   return ret;
 }
+
+bool Lexer::isparen(char c) const { return ('(' == c) || (')' == c); }
 
 const char *Lexer::string() {
   buffer.emplace_back('\0');

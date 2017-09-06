@@ -108,6 +108,30 @@ TEST(lexer, colAdvance) {
   EXPECT_EQ(l.col(), 3);
 }
 
+TEST(lexer, parensRules) {
+  const auto str = "(hest)";
+  Lexer l(str);
+  ASSERT_EQ(Lexer::TokenType::START_PAREN, l.nextToken());
+  ASSERT_EQ(Lexer::TokenType::SYMBOL, l.nextToken());
+  EXPECT_STREQ("hest", l.string()) << l.string();
+
+  ASSERT_EQ(Lexer::TokenType::END_PAREN, l.nextToken());
+  ASSERT_EQ(Lexer::TokenType::TOKEN_EOF, l.nextToken());
+}
+
+
+TEST(lexer, ignoreWhiteSpace) {
+  const auto str = "(      hest          )";
+  Lexer l(str);
+  ASSERT_EQ(Lexer::TokenType::START_PAREN, l.nextToken());
+  ASSERT_EQ(Lexer::TokenType::SYMBOL, l.nextToken());
+  EXPECT_STREQ("hest", l.string()) << l.string();
+
+  ASSERT_EQ(Lexer::TokenType::END_PAREN, l.nextToken());
+  ASSERT_EQ(Lexer::TokenType::TOKEN_EOF, l.nextToken());
+}
+
+
 
 
 int main(int argc, char **argv) {
