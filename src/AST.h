@@ -5,23 +5,24 @@
 
 class AST {
 public:
+  using List = std::vector<std::shared_ptr<AST>>;
   enum class Type {
     SEXPR,
     SYMBOL,
     INTEGER,
     STRING,
-    FUN,
+    DEFINE,
+    BUILTIN
   };
 
   explicit AST(Type type) : type_(type) {}
 
   Type type() const { return type_; };
+  void setType(const Type &type) { type_ = type; };
 
-  void setChildren(std::vector<std::shared_ptr<AST>> children) {
-    children_ = children;
-  }
+  void setChildren(List children) { children_ = children; }
   void addChild(std::shared_ptr<AST> child) { children_.push_back(child); }
-  std::vector<std::shared_ptr<AST>> children() { return children_; }
+  List children() { return children_; }
 
   std::shared_ptr<AST> &operator[](std::size_t idx) { return children_[idx]; }
   const std::shared_ptr<AST> &operator[](std::size_t idx) const {
@@ -38,14 +39,16 @@ public:
       return "INTEGER";
     case Type::STRING:
       return "STRING";
-    case Type::FUN:
-      return "FUN";
+    case Type::BUILTIN:
+      return "BUILTIN";
+    case Type::DEFINE:
+      return "DEFINE";
     }
   }
 
 private:
   Type type_;
-  std::vector<std::shared_ptr<AST>> children_;
+  List children_;
 };
 
 class ASTSexpr : public AST {
@@ -66,7 +69,8 @@ private:
 };
 
 using ASTInt = ASTValueNode<int, AST::Type::INTEGER>;
-using ASTSTring = ASTValueNode<const char *, AST::Type::STRING>;
+using ASTString = ASTValueNode<const char *, AST::Type::STRING>;
 using ASTSymbol = ASTValueNode<const char *, AST::Type::SYMBOL>;
+using ASTBuiltin = ASTValueNode<const char *, AST::Type::SYMBOL>;
 
 #endif /* !AST_H_ */

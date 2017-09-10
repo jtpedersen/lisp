@@ -77,6 +77,46 @@ TEST(parser, unbalanced) {
   ASSERT_THROW(p.read(), SyntaxError);
 }
 
+TEST(parser, defineSexpr) {
+  Lexer l("(define () () )");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::DEFINE, ast->type());
+}
+
+TEST(parser, defineMustHaveArgumentList) {
+  Lexer l("(define )");
+  Parser p(l);
+  try {
+    p.read();
+    FAIL();
+  } catch (SyntaxError &e) {
+    const auto msg = "Define must have argumentlist and body";
+    EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
+  }
+}
+
+TEST(parser, defineMustHaveBody) {
+  Lexer l("(define () )");
+  Parser p(l);
+  try {
+    p.read();
+    FAIL();
+  } catch (SyntaxError &e) {
+    const auto msg = "Define must have a body";
+    EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
+  }
+}
+
+TEST(parser, builtinAdd) {
+  Lexer l("(+)");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_EQ(1, ast->children().size());
+  const auto first = ast->children()[0];
+  EXPECT_EQ(first->type(), AST::Type::BUILTIN);
+}
 
 
 

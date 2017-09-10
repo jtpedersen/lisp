@@ -38,6 +38,11 @@ private:
   void syntaxError(const char *msg);
   std::shared_ptr<AST> readSexpr();
   std::shared_ptr<AST> readExpr();
+
+
+  bool isBuiltin(const char *name) const;
+  std::shared_ptr<ASTBuiltin> builtinFromName(const char *name);
+
 };
 
 #endif /* !PARSER_H_ */
