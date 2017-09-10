@@ -1,19 +1,13 @@
 #ifndef AST_H_
 #define AST_H_
 #include <memory>
+#include <string.h>
 #include <vector>
 
 class AST {
 public:
   using List = std::vector<std::shared_ptr<AST>>;
-  enum class Type {
-    SEXPR,
-    SYMBOL,
-    INTEGER,
-    STRING,
-    DEFINE,
-    BUILTIN
-  };
+  enum class Type { SEXPR, SYMBOL, INTEGER, STRING, DEFINE, BUILTIN };
 
   explicit AST(Type type) : type_(type) {}
 
@@ -71,6 +65,53 @@ private:
 using ASTInt = ASTValueNode<int, AST::Type::INTEGER>;
 using ASTString = ASTValueNode<const char *, AST::Type::STRING>;
 using ASTSymbol = ASTValueNode<const char *, AST::Type::SYMBOL>;
-using ASTBuiltin = ASTValueNode<const char *, AST::Type::SYMBOL>;
+
+class ASTBuiltin : public AST {
+public:
+  enum class Operator {
+    ADD,
+    SUB,
+    DIV,
+    MUL,
+    MOD,
+    UNKNOWN,
+    // TODO && || etc
+  };
+  explicit ASTBuiltin(Operator op) : AST(Type::BUILTIN), op_(op) {}
+  Operator op() const { return op_; }
+
+  static const char *operatorToCString(Operator op) {
+    switch (op) {
+    case Operator::ADD:
+      return "ADD";
+    case Operator::SUB:
+      return "SUB";
+    case Operator::DIV:
+      return "DIV";
+    case Operator::MUL:
+      return "MUL";
+    case Operator::MOD:
+      return "MOD";
+    case Operator::UNKNOWN:
+      return "UNKNOWN";
+    }
+  }
+
+  static Operator operatorFromCString(const char *str) {
+    if (0 == strcmp("+", str)) {
+      return Operator::ADD;
+    } else if (0 == strcmp("-", str)) {
+      return Operator::SUB;
+    } else if (0 == strcmp("/", str)) {
+      return Operator::DIV;
+    } else if (0 == strcmp("*", str)) {
+      return Operator::MUL;
+    }
+    return Operator::UNKNOWN;
+  }
+
+private:
+  Operator op_;
+};
 
 #endif /* !AST_H_ */

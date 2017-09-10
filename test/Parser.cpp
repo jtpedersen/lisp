@@ -116,8 +116,49 @@ TEST(parser, builtinAdd) {
   ASSERT_EQ(1, ast->children().size());
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
+  const auto node = std::static_pointer_cast<ASTBuiltin>(first);
+  EXPECT_EQ(ASTBuiltin::Operator::ADD, node->op())
+      << ASTBuiltin::operatorToCString(node->op());
 }
 
+TEST(parser, builtinSub) {
+  Lexer l("(-)");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_EQ(1, ast->children().size());
+  const auto first = ast->children()[0];
+  EXPECT_EQ(first->type(), AST::Type::BUILTIN);
+  const auto node = std::static_pointer_cast<ASTBuiltin>(first);
+  EXPECT_EQ(ASTBuiltin::Operator::SUB, node->op())
+      << ASTBuiltin::operatorToCString(node->op());
+}
+
+TEST(parser, builtinDiv) {
+  Lexer l("(/)");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_EQ(1, ast->children().size());
+  const auto first = ast->children()[0];
+  EXPECT_EQ(first->type(), AST::Type::BUILTIN);
+  const auto node = std::static_pointer_cast<ASTBuiltin>(first);
+  EXPECT_EQ(ASTBuiltin::Operator::DIV, node->op())
+      << ASTBuiltin::operatorToCString(node->op());
+}
+
+TEST(parser, builtinMul) {
+  Lexer l("(*)");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_EQ(1, ast->children().size());
+  const auto first = ast->children()[0];
+  EXPECT_EQ(first->type(), AST::Type::BUILTIN);
+  const auto node = std::static_pointer_cast<ASTBuiltin>(first);
+  EXPECT_EQ(ASTBuiltin::Operator::MUL, node->op())
+      << ASTBuiltin::operatorToCString(node->op());
+}
 
 
 int main(int argc, char **argv) {

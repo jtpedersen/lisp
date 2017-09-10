@@ -61,9 +61,9 @@ std::shared_ptr<AST> Parser::readExpr() {
   std::cout << "Read token: " << tokenType << std::endl;
   if (TokenType::SYMBOL == tokenType) {
     const auto name = lexer.string();
-    if (isBuiltin(name)) {
-      std::cout << "YESSS" << std::endl;
-      return builtinFromName(name);
+    const auto op = ASTBuiltin::operatorFromCString(name);
+    if (ASTBuiltin::Operator::UNKNOWN != op) {
+      return std::make_shared<ASTBuiltin>(op);
     }
     return std::make_shared<ASTSymbol>(name);
   } else if (TokenType::INTEGER == tokenType) {
