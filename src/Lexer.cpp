@@ -1,10 +1,10 @@
 #include "Lexer.h"
 #include <cassert>
 #include <ctype.h>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <iostream>
 
 Lexer::Lexer(const char *const data)
     : data(data), pos(data), good(true), current('\0'), line_(0), col_(0) {}
@@ -13,7 +13,8 @@ Lexer::TokenType Lexer::nextToken() {
   nextChar();
   if (!good)
     return TokenType::TOKEN_EOF;
-  if (isspace(current)) return nextToken();
+  if (isspace(current))
+    return nextToken();
   // printf("c %c\n", c);
   switch (current) {
   case '\0':
@@ -68,8 +69,6 @@ Lexer::TokenType Lexer::readString() {
 
 Lexer::TokenType Lexer::readAtom() {
   buffer.clear();
-  const auto ret = (isdigit(current) || '-' == current) ? TokenType::INTEGER
-                                                        : TokenType::SYMBOL;
   do {
     if (isspace(current)) {
       break;
@@ -78,7 +77,10 @@ Lexer::TokenType Lexer::readAtom() {
     if (isparen(peek()))
       break;
   } while (nextChar());
-  return ret;
+
+  if (isdigit(buffer.front())) return TokenType::INTEGER;
+  if ('-' == buffer.front() && buffer.size() > 1) return TokenType::INTEGER;
+  return TokenType::SYMBOL;
 }
 
 bool Lexer::isparen(char c) const { return ('(' == c) || (')' == c); }

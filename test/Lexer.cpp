@@ -149,6 +149,14 @@ TEST(lexer, twoChar) {
   EXPECT_STREQ("ab", l.string()) << l.string();
 }
 
+TEST(lexer, minusIsSymbol) {
+  const auto str = "-";
+  Lexer l(str);
+  ASSERT_EQ(Lexer::TokenType::SYMBOL, l.nextToken());
+  EXPECT_STREQ("-", l.string()) << l.string();
+}
+
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
