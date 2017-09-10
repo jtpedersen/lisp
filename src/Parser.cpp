@@ -32,7 +32,7 @@ std::shared_ptr<AST> Parser::read() {
 std::shared_ptr<AST> Parser::readSexpr() {
   AST::List ls;
   while (const auto element = readExpr()) {
-    std::cout << "Adding element: " << element->type() << std::endl;
+    //    std::cout << "Adding element: " << element->type() << std::endl;
     ls.emplace_back(element);
   }
   if (ls.size() == 0) {
@@ -58,7 +58,7 @@ std::shared_ptr<AST> Parser::readSexpr() {
 
 std::shared_ptr<AST> Parser::readExpr() {
   const auto tokenType = lexer.nextToken();
-  std::cout << "Read token: " << tokenType << std::endl;
+  //  std::cout << "Read token: " << tokenType << std::endl;
   if (TokenType::SYMBOL == tokenType) {
     const auto name = lexer.string();
     const auto op = ASTBuiltin::operatorFromCString(name);
@@ -79,12 +79,4 @@ std::shared_ptr<AST> Parser::readExpr() {
 
 void Parser::syntaxError(const char *msg) {
   throw SyntaxError(msg, lexer.line(), lexer.col());
-}
-
-bool Parser::isBuiltin(const char *name) const {
-  std::cout << "is " << name << " a + " << strcmp(name, "+") << "   " << strlen(name) << std::endl;
-  return 0 == strcmp("+", name);
-}
-std::shared_ptr<ASTBuiltin> Parser::builtinFromName(const char *name) {
-  return nullptr;
 }
