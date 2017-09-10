@@ -44,7 +44,7 @@ std::shared_ptr<AST> Parser::readSexpr() {
   const auto first = ls[0];
   if (first->type() == AST::Type::SYMBOL) {
     auto symbolNode = std::static_pointer_cast<ASTSymbol>(first);
-    if (strcmp(symbolNode->value(), "define") == 0) {
+    if (strcmp(symbolNode->data(), "define") == 0) {
       ret->setType(AST::Type::DEFINE);
       if (1 == ls.size()) {
         syntaxError("Define must have argumentlist and body");

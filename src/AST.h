@@ -50,21 +50,21 @@ public:
   explicit ASTSexpr() : AST(Type::SEXPR) {}
 };
 
-template <typename ValueType, AST::Type TypeType>
-class ASTValueNode : public AST {
+template <typename DataType, AST::Type TypeType>
+class ASTDataNode : public AST {
 public:
-  explicit ASTValueNode(const ValueType &value)
-      : AST(TypeType), value_(value) {}
+  explicit ASTDataNode(const DataType &data)
+      : AST(TypeType), data_(data) {}
 
-  const ValueType &value() const { return value_; };
+  const DataType &data() const { return data_; };
 
 private:
-  ValueType value_;
+  DataType data_;
 };
 
-using ASTInt = ASTValueNode<int, AST::Type::INTEGER>;
-using ASTString = ASTValueNode<const char *, AST::Type::STRING>;
-using ASTSymbol = ASTValueNode<const char *, AST::Type::SYMBOL>;
+using ASTInt = ASTDataNode<int, AST::Type::INTEGER>;
+using ASTString = ASTDataNode<const char *, AST::Type::STRING>;
+using ASTSymbol = ASTDataNode<const char *, AST::Type::SYMBOL>;
 
 class ASTBuiltin : public AST {
 public:
