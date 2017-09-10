@@ -1,7 +1,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-
 #include "Lexer.h"
 
 TEST(lexer, none) {
@@ -89,7 +88,6 @@ TEST(lexer, negativeInteger) {
   ASSERT_EQ(Lexer::TokenType::TOKEN_EOF, l.nextToken());
 }
 
-
 TEST(lexer, location) {
   const auto str = "1";
   Lexer l(str);
@@ -119,7 +117,6 @@ TEST(lexer, parensRules) {
   ASSERT_EQ(Lexer::TokenType::TOKEN_EOF, l.nextToken());
 }
 
-
 TEST(lexer, ignoreWhiteSpace) {
   const auto str = "(      hest          )";
   Lexer l(str);
@@ -131,8 +128,26 @@ TEST(lexer, ignoreWhiteSpace) {
   ASSERT_EQ(Lexer::TokenType::TOKEN_EOF, l.nextToken());
 }
 
+TEST(lexer, symbol) {
+  const auto str = "+";
+  Lexer l(str);
+  ASSERT_EQ(Lexer::TokenType::SYMBOL, l.nextToken());
+  EXPECT_STREQ("+", l.string()) << l.string();
+}
 
+TEST(lexer, singleChar) {
+  const auto str = "a";
+  Lexer l(str);
+  ASSERT_EQ(Lexer::TokenType::SYMBOL, l.nextToken());
+  EXPECT_STREQ("a", l.string()) << l.string();
+}
 
+TEST(lexer, twoChar) {
+  const auto str = "ab";
+  Lexer l(str);
+  ASSERT_EQ(Lexer::TokenType::SYMBOL, l.nextToken());
+  EXPECT_STREQ("ab", l.string()) << l.string();
+}
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

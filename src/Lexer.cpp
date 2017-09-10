@@ -51,11 +51,11 @@ Lexer::TokenType Lexer::readString() {
   buffer.clear();
   bool escape = false;
   while (nextChar()) {
+
     if ('\\' == current) {
       escape = true;
       continue;
     }
-
     if (!escape && '"' == current) {
       break;
     }
@@ -64,7 +64,6 @@ Lexer::TokenType Lexer::readString() {
     buffer.emplace_back(current);
   }
   return good ? TokenType::STRING : TokenType::TOKEN_EOF;
-  ;
 }
 
 Lexer::TokenType Lexer::readAtom() {
@@ -72,7 +71,7 @@ Lexer::TokenType Lexer::readAtom() {
   const auto ret = (isdigit(current) || '-' == current) ? TokenType::INTEGER
                                                         : TokenType::SYMBOL;
   do {
-    if (!isalnum(current) && '-' != current) {
+    if (isspace(current)) {
       break;
     }
     buffer.emplace_back(current);
