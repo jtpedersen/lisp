@@ -16,8 +16,21 @@ TEST(parser, minimal) {
 TEST(parser, symbol) {
   Lexer l("hest");
   Parser p(l);
-  ASSERT_THROW(p.read(), SyntaxError);
+  const auto ast = p.read();
+  ASSERT_NE(ast, nullptr);
+  ASSERT_EQ(AST::Type::SYMBOL, ast->type());
+  ASSERT_EQ(ast->children().size(), 0);
 }
+
+TEST(parser, String) {
+  Lexer l("\"hest\"");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_NE(ast, nullptr);
+  ASSERT_EQ(AST::Type::STRING, ast->type());
+  ASSERT_EQ(ast->children().size(), 0);
+}
+
 
 TEST(parser, singleSymbolChild) {
   Lexer l("(hest)");
@@ -159,6 +172,30 @@ TEST(parser, builtinMul) {
   EXPECT_EQ(ASTBuiltin::Operator::MUL, node->op())
       << ASTBuiltin::operatorToCString(node->op());
 }
+
+
+TEST(parser, toStringInteger) {
+  Lexer l("12");
+  Parser p(l);
+  const auto ast = p.read();
+  EXPECT_STREQ("12", ast->toString());
+}
+
+TEST(parser, toStringSymbol) {
+  Lexer l("hest");
+  Parser p(l);
+  const auto ast = p.read();
+  EXPECT_STREQ("hest", ast->toString());
+}
+
+TEST(parser, toStringString) {
+  Lexer l("\"hest\"");
+  Parser p(l);
+  const auto ast = p.read();
+  EXPECT_STREQ("\"hest\"", ast->toString());
+}
+
+
 
 
 int main(int argc, char **argv) {

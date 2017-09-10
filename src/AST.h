@@ -40,6 +40,8 @@ public:
     }
   }
 
+  virtual const char *toString() { return TypeToCString(type()); }
+
 private:
   Type type_;
   List children_;
@@ -53,18 +55,38 @@ public:
 template <typename DataType, AST::Type TypeType>
 class ASTDataNode : public AST {
 public:
-  explicit ASTDataNode(const DataType &data)
-      : AST(TypeType), data_(data) {}
-
+  explicit ASTDataNode(const DataType &data) : AST(TypeType), data_(data) {}
   const DataType &data() const { return data_; };
 
 private:
   DataType data_;
 };
 
-using ASTInt = ASTDataNode<int, AST::Type::INTEGER>;
-using ASTString = ASTDataNode<const char *, AST::Type::STRING>;
-using ASTSymbol = ASTDataNode<const char *, AST::Type::SYMBOL>;
+class ASTInt : public ASTDataNode<int, AST::Type::INTEGER> {
+public:
+  explicit ASTInt(int data) : ASTDataNode(data){};
+  const char *toString() override {
+    char buf[1024];
+    snprintf(buf, 1024, "%d", data());
+    return strdup(buf);
+  }
+};
+
+class ASTSymbol : public ASTDataNode<const char *, AST::Type::SYMBOL> {
+public:
+  explicit ASTSymbol(const char *data) : ASTDataNode(data){};
+  const char *toString() override { return data(); }
+};
+
+class ASTString : public ASTDataNode<const char *, AST::Type::STRING> {
+public:
+  explicit ASTString(const char *data) : ASTDataNode(data){};
+  const char *toString() override {
+    char buf[1024];
+    snprintf(buf, 1024, "\"%s\"", data());
+    return strdup(buf);
+  }
+};
 
 class ASTBuiltin : public AST {
 public:

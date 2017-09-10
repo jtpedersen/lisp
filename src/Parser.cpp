@@ -19,15 +19,7 @@ const char *SyntaxError::what() const noexcept {
 
 Parser::Parser(const Lexer &lexer) : lexer(lexer) {}
 
-std::shared_ptr<AST> Parser::read() {
-  const auto tokenType = lexer.nextToken();
-  if (TokenType::START_PAREN != tokenType) {
-    syntaxError((std::string("Expected Sexpr start but got ") +
-                 Lexer::TokenToCString(tokenType))
-                    .c_str());
-  }
-  return readSexpr();
-}
+std::shared_ptr<AST> Parser::read() { return readExpr(); }
 
 std::shared_ptr<AST> Parser::readSexpr() {
   AST::List ls;
@@ -68,6 +60,8 @@ std::shared_ptr<AST> Parser::readExpr() {
     return std::make_shared<ASTSymbol>(name);
   } else if (TokenType::INTEGER == tokenType) {
     return std::make_shared<ASTInt>(lexer.integer());
+  } else if (TokenType::STRING == tokenType) {
+    return std::make_shared<ASTString>(lexer.string());
   } else if (TokenType::START_PAREN == tokenType) {
     return readSexpr();
   } else if (TokenType::END_PAREN == tokenType) {
