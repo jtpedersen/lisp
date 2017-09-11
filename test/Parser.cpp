@@ -174,6 +174,15 @@ TEST(parser, builtinMul) {
 }
 
 
+TEST(parser, builtinArgs) {
+  Lexer l("(* 1 2 3)");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_EQ(4, ast->children().size());
+}
+
+
 TEST(parser, toStringInteger) {
   Lexer l("12");
   Parser p(l);

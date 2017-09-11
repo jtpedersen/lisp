@@ -4,6 +4,7 @@ ADD_EXECUTABLE(
   Lexer.cpp
   Parser.cpp
   Util.cpp
+  Interpreter.cpp
   )
 
 

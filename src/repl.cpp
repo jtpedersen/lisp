@@ -1,10 +1,13 @@
 #include "Lexer.h"
 #include "Parser.h"
+#include "Interpreter.h"
+
 #include <iostream>
 #include <string>
 
 using namespace std;
 const string PROMPT(">");
+
 
 int main(int argc, char *argv[]) {
   string line;
@@ -16,6 +19,7 @@ int main(int argc, char *argv[]) {
       Parser p(l);
       const auto program = p.read();
       cout << "\t" << program->toString() << endl;
+      cout << "\t" << eval(program)->toString() << endl;
       cout << "\n" << PROMPT;
     } catch (const exception &e) {
       cout << "Error occurred: " << e.what() << endl;
