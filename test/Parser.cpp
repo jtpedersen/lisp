@@ -3,6 +3,7 @@
 
 #include "Parser.h"
 #include "Util.h"
+#include "SyntaxError.h"
 
 TEST(parser, minimal) {
   Lexer l("()");

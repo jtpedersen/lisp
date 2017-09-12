@@ -10,7 +10,10 @@ endmacro(TESTCASE)
 TESTCASE(frist frist.cpp)
 
 TESTCASE(lexer Lexer.cpp ../src/Lexer.cpp)
+target_link_libraries(lexer lisp)
 
-TESTCASE(parser Parser.cpp ../src/Lexer.cpp ../src/Parser.cpp ../src/Util.cpp)
+TESTCASE(parser Parser.cpp)
+target_link_libraries(parser lisp)
 
-TESTCASE(interpreter Interpreter.cpp ../src/Interpreter.cpp ../src/Lexer.cpp ../src/Parser.cpp ../src/Util.cpp)
+TESTCASE(interpreter Interpreter.cpp)
+target_link_libraries(interpreter lisp)

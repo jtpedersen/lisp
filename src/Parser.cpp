@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "SyntaxError.h"
 #include "Util.h"
 #include <cassert>
 #include <iostream>
@@ -7,15 +8,6 @@
 #include <string.h>
 
 using TokenType = Lexer::TokenType;
-
-SyntaxError::SyntaxError(const char *what, int line, int col)
-    : msg(what), line(line), col(col) {}
-
-const char *SyntaxError::what() const noexcept {
-  char *buf = static_cast<char *>(malloc(strlen(msg) + 1024));
-  sprintf(buf, "%s on line %d:%d", msg, line, col);
-  return buf;
-}
 
 Parser::Parser(const Lexer &lexer) : lexer(lexer) {}
 

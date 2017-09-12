@@ -128,7 +128,10 @@ public:
       return Operator::DIV;
     } else if (0 == strcmp("*", str)) {
       return Operator::MUL;
+    } else if (0 == strcmp("%", str)) {
+      return Operator::MOD;
     }
+
     return Operator::UNKNOWN;
   }
 

@@ -3,7 +3,6 @@
 #include "AST.h"
 #include "Lexer.h"
 
-#include <exception>
 #include <memory>
 
 // "                                          \
@@ -13,18 +12,6 @@
   //   expr   : <number> | <symbol> | <sexpr> ; \
   //   lispy  : /^/ <expr>* /$/ ;               \
   // ",
-
-class SyntaxError : public std::exception {
-public:
-  SyntaxError(const char *what, int line, int col);
-
-  const char *what() const noexcept override;
-
-private:
-  const char *msg;
-  int line;
-  int col;
-};
 
 class Parser {
 public:
