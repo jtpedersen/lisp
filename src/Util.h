@@ -5,12 +5,14 @@
 #include <string>
 #include <vector>
 
-#include "Lexer.h"
 #include "AST.h"
+#include "Lexer.h"
 
 /// helping utilites
 namespace util {
 std::vector<Lexer::TokenType> tokenizeFile(std::string file);
+
+void print(std::shared_ptr<AST> node);
 }
 
 namespace std {

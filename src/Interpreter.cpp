@@ -9,7 +9,6 @@ int applyIntOp(const int acc, const AST::List ls, const size_t idx,
 
   if (ls.size() == idx)
     return acc;
-  std::cout << acc << " for " << idx << std::endl;
   assert(ls[idx]->type() == AST::Type::INTEGER);
   const auto intNode = std::static_pointer_cast<ASTInt>(ls[idx]);
   return applyIntOp(op(acc, intNode->data()), ls, idx + 1, op);
@@ -17,7 +16,7 @@ int applyIntOp(const int acc, const AST::List ls, const size_t idx,
 
 std::shared_ptr<AST> evalBuiltin(AST::List ls) {
   assert(ls.front()->type() == AST::Type::BUILTIN);
-  std::cout << "EVAL BUILTIN: " << ls.front()->toString() << std::endl;
+  //  std::cout << "EVAL BUILTIN: " << ls.front()->toString() << std::endl;
   if (ls.size() == 1)
     throw SyntaxError("Expected operators for operator", ls.front());
 
@@ -52,8 +51,8 @@ std::shared_ptr<AST> evalBuiltin(AST::List ls) {
 }
 
 std::shared_ptr<AST> eval(std::shared_ptr<AST> node) {
-  std::cout << "EVAL: " << node->toString()
-            << "childCnt:" << node->children().size() << std::endl;
+  // std::cout << "EVAL: " << node->toString()
+  //           << "childCnt:" << node->children().size() << std::endl;
   if (node->children().size() == 0)
     return node;
   AST::List ls;

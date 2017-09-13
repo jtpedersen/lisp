@@ -105,15 +105,15 @@ public:
   static const char *operatorToCString(Operator op) {
     switch (op) {
     case Operator::ADD:
-      return "ADD";
+      return "+";
     case Operator::SUB:
-      return "SUB";
+      return "-";
     case Operator::DIV:
-      return "DIV";
+      return "/";
     case Operator::MUL:
-      return "MUL";
+      return "*";
     case Operator::MOD:
-      return "MOD";
+      return "%";
     case Operator::UNKNOWN:
       return "UNKNOWN";
     }
@@ -134,6 +134,8 @@ public:
 
     return Operator::UNKNOWN;
   }
+
+  const char *toString() override { return operatorToCString(op()); }
 
 private:
   Operator op_;

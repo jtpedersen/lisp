@@ -1,5 +1,7 @@
 #include "Util.h"
 
+#include <algorithm>
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -20,6 +22,37 @@ std::vector<Lexer::TokenType> tokenizeFile(std::string file) {
 
   return res;
 }
+
+void print(std::shared_ptr<AST> node) {
+  assert(node);
+  using namespace std;
+  using Type = AST::Type;
+  switch (node->type()) {
+  case Type::SEXPR: {
+    cout << "(";
+    bool first = true;
+    for (const auto &child : node->children()) {
+      if (!first) {
+        cout << " ";
+      } else {
+        first = false;
+      }
+      print(child);
+    }
+    cout << ")";
+    break;
+  }
+  case Type::SYMBOL:
+  case Type::INTEGER:
+  case Type::STRING:
+  case Type::BUILTIN:
+    cout << node->toString();
+    break;
+  case Type::DEFINE:
+    cout << "define ";
+  }
+}
+
 } // util
 
 namespace std {
