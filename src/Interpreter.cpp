@@ -6,7 +6,6 @@
 
 int applyIntOp(const int acc, const AST::List ls, const size_t idx,
                std::function<int(const int, const int)> op) {
-
   if (ls.size() == idx)
     return acc;
   assert(ls[idx]->type() == AST::Type::INTEGER);
@@ -51,8 +50,6 @@ std::shared_ptr<AST> evalBuiltin(AST::List ls) {
 }
 
 std::shared_ptr<AST> eval(std::shared_ptr<AST> node) {
-  // std::cout << "EVAL: " << node->toString()
-  //           << "childCnt:" << node->children().size() << std::endl;
   if (node->children().size() == 0)
     return node;
   AST::List ls;
