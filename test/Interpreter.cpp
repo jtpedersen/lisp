@@ -273,6 +273,15 @@ TEST_F(InterpreterTest, joinBuiltin) {
   EXPECT_EQ(2, res->children().size()) << res->toString();
 }
 
+TEST_F(InterpreterTest, joinRequiresAtLeastTwo) {
+  try {
+    load("(join (list))");
+    eval(program);
+    FAIL();
+  } catch (SyntaxError &e) {
+  }
+}
+
 TEST_F(InterpreterTest, evalBuiltin) {
   load("(eval (list + 1 2))");
   const auto res = eval(program);
@@ -283,15 +292,6 @@ TEST_F(InterpreterTest, evalBuiltin) {
   EXPECT_EQ(3, i->data());
 }
 
-TEST_F(InterpreterTest, evalNonList) {
-  load("(eval \"hest\")");
-  try {
-    eval(program);
-    FAIL();
-  } catch (SyntaxError &e) {
-  }
-}
-
 TEST_F(InterpreterTest, evalMultiArgs) {
   load("(eval (list - 1 1) \"hest\")");
   try {
@@ -300,7 +300,6 @@ TEST_F(InterpreterTest, evalMultiArgs) {
   } catch (SyntaxError &e) {
   }
 }
-
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

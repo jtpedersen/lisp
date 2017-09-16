@@ -1,5 +1,7 @@
 #include "Interpreter.h"
 #include "SyntaxError.h"
+#include "Util.h"
+
 #include <cassert>
 #include <functional>
 #include <iostream>
@@ -24,7 +26,10 @@ static int applyIntOp(const int acc, const AST::List ls, const size_t idx,
                       std::function<int(const int, const int)> op);
 
 std::shared_ptr<AST> eval(std::shared_ptr<AST> node) {
-  // std::cout << "EVAL: " << node->toString() << std::endl;
+  std::cout << "EVAL: ";
+  util::print(node);
+  std::cout << std::endl;
+
   if (node->children().size() == 0)
     return node;
   const auto op = eval(node->head());
@@ -37,7 +42,9 @@ std::shared_ptr<AST> eval(std::shared_ptr<AST> node) {
 }
 
 std::shared_ptr<AST> evalBuiltin(AST::List ls) {
-  assert(ls.front()->type() == AST::Type::BUILTIN);
+  if (ls.front()->type() != AST::Type::BUILTIN) {
+    throw SyntaxError("Expected builtin", ls.front());
+  }
   const auto opnode = std::static_pointer_cast<ASTBuiltin>(ls.front());
   const auto op = opnode->op();
   if (isIntOp(op)) {
@@ -64,7 +71,9 @@ std::shared_ptr<AST> evalBuiltin(AST::List ls) {
     ret->setChildren(children);
     return ret;
   } else if (op == Builtin::EVAL) {
-    return eval(getSingleListArg(opnode, ls));
+    requireSingleArgument(opnode, ls);
+    const auto node = eval(ls[1]);
+    return eval(node);
   }
 
   return nullptr;
