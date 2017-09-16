@@ -34,18 +34,24 @@ std::shared_ptr<AST> eval(std::shared_ptr<AST> node) {
 
 std::shared_ptr<AST> evalBuiltin(AST::List ls) {
   assert(ls.front()->type() == AST::Type::BUILTIN);
-  if (ls.size() == 1)
-    throw SyntaxError("Expected operators for operator", ls.front());
-
   const auto opnode = std::static_pointer_cast<ASTBuiltin>(ls.front());
   const auto op = opnode->op();
   if (isIntOp(op)) {
     return evalIntOp(op, ls);
   }
+  if (op == Builtin::LIST) {
+    auto ret = std::make_shared<ASTBuiltin>(Builtin::LIST);
+    AST::List children(ls.begin()+1, ls.end());
+    ret->setChildren(children);
+    return ret;
+  }
   return nullptr;
 }
 
 std::shared_ptr<AST> evalIntOp(Builtin intOp, AST::List ls) {
+  if (ls.size() == 1)
+    throw SyntaxError("Expected operators for operator", ls.front());
+
   const auto first = ls[1];
   const auto firstVal = std::static_pointer_cast<ASTInt>(first)->data();
   if (first->type() != AST::Type::INTEGER) {

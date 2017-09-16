@@ -182,9 +182,19 @@ TEST_F(InterpreterTest, listBuiltin) {
   load("(list a b c)");
   const auto res = eval(program);
   ASSERT_NE(nullptr, res);
-  EXPECT_EQ(res->type(), AST::Type::SEXPR);
+  EXPECT_EQ(res->type(), AST::Type::BUILTIN);
+  EXPECT_TRUE(res->isBuiltin(Builtin::LIST));
   EXPECT_EQ(res->children().size(), 3);
   EXPECT_EQ(res->head()->type(), AST::Type::SYMBOL);
+}
+
+TEST_F(InterpreterTest, emptyList) {
+  load("(list)");
+  const auto res = eval(program);
+  ASSERT_NE(nullptr, res);
+  EXPECT_EQ(res->type(), AST::Type::BUILTIN);
+  EXPECT_TRUE(res->isBuiltin(Builtin::LIST));
+  EXPECT_EQ(res->children().size(), 0);
 }
 
 
