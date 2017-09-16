@@ -5,3 +5,4 @@
 (head (head (list (list a b) "hest" )))
 (tail (list (list a b) "hest" ))
 (head (list + -)) 
+(eval (list + 1 2))

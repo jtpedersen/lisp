@@ -301,6 +301,15 @@ TEST(parser, joinNeedsMoreThanOneOperand) {
 }
 
 
+TEST(parser, evalBuiltin) {
+  Lexer l("(eval (list + 1 2))");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::EVAL));
+  ASSERT_EQ(2, ast->children().size());
+}
+
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

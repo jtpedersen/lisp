@@ -5,9 +5,12 @@
 #include <iostream>
 
 static std::shared_ptr<AST> evalIntOp(Builtin intOp, AST::List ls);
-static bool isIntOp(Builtin op);
 static std::shared_ptr<AST> evalBuiltin(AST::List ls);
 static void requireIntType(std::shared_ptr<AST> node);
+static bool isIntOp(Builtin op);
+
+static std::shared_ptr<AST> getSingleListArg(const std::shared_ptr<AST> &opnode,
+                                             const AST::List &ls);
 
 static void requireSingleArgument(const std::shared_ptr<AST> &opnode,
                                   AST::List ls);
@@ -21,7 +24,7 @@ static int applyIntOp(const int acc, const AST::List ls, const size_t idx,
                       std::function<int(const int, const int)> op);
 
 std::shared_ptr<AST> eval(std::shared_ptr<AST> node) {
-  //std::cout << "EVAL: " << node->toString() << std::endl;
+  // std::cout << "EVAL: " << node->toString() << std::endl;
   if (node->children().size() == 0)
     return node;
   const auto op = eval(node->head());
@@ -46,15 +49,9 @@ std::shared_ptr<AST> evalBuiltin(AST::List ls) {
     ret->setChildren(children);
     return ret;
   } else if (op == Builtin::HEAD) {
-    requireSingleArgument(opnode, ls);
-    const auto node = eval(ls[1]);
-    requireNonEmptyList(opnode, node);
-    return node->children().front();
+    return getSingleListArg(opnode, ls)->children().front();
   } else if (op == Builtin::TAIL) {
-    requireSingleArgument(opnode, ls);
-    const auto node = eval(ls[1]);
-    requireNonEmptyList(opnode, node);
-    return node->children().back();
+    return getSingleListArg(opnode, ls)->children().back();
   } else if (op == Builtin::JOIN) {
     AST::List children;
     for (auto it = (ls.begin() + 1); it != ls.end(); ++it) {
@@ -66,6 +63,8 @@ std::shared_ptr<AST> evalBuiltin(AST::List ls) {
     auto ret = std::make_shared<ASTBuiltin>(Builtin::LIST);
     ret->setChildren(children);
     return ret;
+  } else if (op == Builtin::EVAL) {
+    return eval(getSingleListArg(opnode, ls));
   }
 
   return nullptr;
@@ -125,6 +124,14 @@ void requireIntType(std::shared_ptr<AST> node) {
   if (node->type() != AST::Type::INTEGER) {
     throw SyntaxError("Operator works only on integer types", node);
   }
+}
+
+std::shared_ptr<AST> getSingleListArg(const std::shared_ptr<AST> &opnode,
+                                      const AST::List &ls) {
+  requireSingleArgument(opnode, ls);
+  const auto node = eval(ls[1]);
+  requireNonEmptyList(opnode, node);
+  return node;
 }
 
 void requireNonEmptyList(const std::shared_ptr<AST> &opnode,

@@ -273,6 +273,35 @@ TEST_F(InterpreterTest, joinBuiltin) {
   EXPECT_EQ(2, res->children().size()) << res->toString();
 }
 
+TEST_F(InterpreterTest, evalBuiltin) {
+  load("(eval (list + 1 2))");
+  const auto res = eval(program);
+  ASSERT_NE(nullptr, res);
+  ASSERT_EQ(res->type(), AST::Type::INTEGER) << res->toString();
+  EXPECT_EQ(0, res->children().size()) << res->toString();
+  const auto i = std::static_pointer_cast<ASTInt>(res);
+  EXPECT_EQ(3, i->data());
+}
+
+TEST_F(InterpreterTest, evalNonList) {
+  load("(eval \"hest\")");
+  try {
+    eval(program);
+    FAIL();
+  } catch (SyntaxError &e) {
+  }
+}
+
+TEST_F(InterpreterTest, evalMultiArgs) {
+  load("(eval (list - 1 1) \"hest\")");
+  try {
+    eval(program);
+    FAIL();
+  } catch (SyntaxError &e) {
+  }
+}
+
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

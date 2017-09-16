@@ -22,6 +22,8 @@ const char *builtinToCString(Builtin op) {
     return "tail";
   case Builtin::JOIN:
     return "join";
+  case Builtin::EVAL:
+    return "eval";
   case Builtin::UNKNOWN:
     return "UNKNOWN";
   }
@@ -50,6 +52,8 @@ Builtin builtinFromCString(const char *str) {
     return Builtin::TAIL;
   } else if (0 == strcmp("join", str)) {
     return Builtin::JOIN;
+  } else if (0 == strcmp("eval", str)) {
+    return Builtin::EVAL;
   }
   return Builtin::UNKNOWN;
 }
