@@ -48,8 +48,6 @@ void print(std::shared_ptr<AST> node) {
   case Type::BUILTIN:
     cout << node->toString();
     break;
-  case Type::DEFINE:
-    cout << "define ";
   }
 }
 

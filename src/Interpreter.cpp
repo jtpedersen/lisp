@@ -30,17 +30,17 @@ std::shared_ptr<AST> evalBuiltin(AST::List ls) {
   const auto op = [opType = opnode->op()]()
                       ->std::function<int(const int, const int)> {
     switch (opType) {
-    case ASTBuiltin::Operator::ADD:
+    case Builtin::ADD:
       return [](const int a, const int b) { return a + b; };
-    case ASTBuiltin::Operator::SUB:
+    case Builtin::SUB:
       return [](const int a, const int b) { return a - b; };
-    case ASTBuiltin::Operator::MUL:
+    case Builtin::MUL:
       return [](const int a, const int b) { return a * b; };
-    case ASTBuiltin::Operator::DIV:
+    case Builtin::DIV:
       return [](const int a, const int b) { return a / b; };
-    case ASTBuiltin::Operator::MOD:
+    case Builtin::MOD:
       return [](const int a, const int b) { return a % b; };
-    case ASTBuiltin::Operator::UNKNOWN:
+    case Builtin::UNKNOWN:
       throw new SyntaxError("Can not use unknown op", 0, 0);
     }
     return nullptr;

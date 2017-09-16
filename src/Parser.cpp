@@ -26,16 +26,8 @@ std::shared_ptr<AST> Parser::readSexpr() {
   ret->setChildren(ls);
 
   const auto first = ls[0];
-  if (first->type() == AST::Type::SYMBOL) {
-    auto symbolNode = std::static_pointer_cast<ASTSymbol>(first);
-    if (strcmp(symbolNode->data(), "define") == 0) {
-      ret->setType(AST::Type::DEFINE);
-      if (1 == ls.size()) {
-        syntaxError("Define must have argumentlist and body");
-      } else if (2 == ls.size()) {
-        syntaxError("Define must have a body");
-      }
-    }
+  if (AST::Type::BUILTIN == first->type()) {
+    checkSyntaxForBuiltin(ls);
   }
   return ret;
 }
@@ -45,8 +37,8 @@ std::shared_ptr<AST> Parser::readExpr() {
   //  std::cout << "Read token: " << tokenType << std::endl;
   if (TokenType::SYMBOL == tokenType) {
     const auto name = lexer.string();
-    const auto op = ASTBuiltin::operatorFromCString(name);
-    if (ASTBuiltin::Operator::UNKNOWN != op) {
+    const auto op = builtinFromCString(name);
+    if (Builtin::UNKNOWN != op) {
       return std::make_shared<ASTBuiltin>(op);
     }
     return std::make_shared<ASTSymbol>(name);
@@ -61,6 +53,32 @@ std::shared_ptr<AST> Parser::readExpr() {
   }
   syntaxError("Expected expression");
   return nullptr; // to please the compiler
+}
+
+void Parser::checkSyntaxForBuiltin(AST::List ls) const {
+  const auto first = std::static_pointer_cast<ASTBuiltin>(ls.front());
+  if (!first)
+    throw SyntaxError("Expected builtin", ls.front());
+  switch (first->op()) {
+  case Builtin::ADD:
+  case Builtin::SUB:
+  case Builtin::DIV:
+  case Builtin::MUL:
+  case Builtin::MOD:
+
+    break;
+  case Builtin::DEFINE: {
+    if (1 == ls.size()) {
+      throw SyntaxError("Define must have argumentlist and body", first);
+    } else if (2 == ls.size()) {
+      throw SyntaxError("Define must have a body", first);
+    }
+    break;
+  }
+  case Builtin::LIST:
+  case Builtin::UNKNOWN:
+    break;
+  }
 }
 
 void Parser::syntaxError(const char *msg) {

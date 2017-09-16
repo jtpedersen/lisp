@@ -4,10 +4,25 @@
 #include <string.h>
 #include <vector>
 
+enum class Builtin {
+  ADD,
+  SUB,
+  DIV,
+  MUL,
+  MOD,
+  DEFINE,
+  LIST,
+  UNKNOWN,
+  // TODO && || etc
+};
+
+const char *builtinToCString(Builtin op);
+Builtin builtinFromCString(const char *str);
+
 class AST {
 public:
   using List = std::vector<std::shared_ptr<AST>>;
-  enum class Type { SEXPR, SYMBOL, INTEGER, STRING, DEFINE, BUILTIN };
+  enum class Type { SEXPR, SYMBOL, INTEGER, STRING, BUILTIN };
 
   explicit AST(Type type) : type_(type) {}
 
@@ -17,6 +32,7 @@ public:
   void setChildren(List children) { children_ = children; }
   void addChild(std::shared_ptr<AST> child) { children_.push_back(child); }
   List children() { return children_; }
+  std::shared_ptr<AST> head() const { return children_.front(); }
 
   std::shared_ptr<AST> &operator[](std::size_t idx) { return children_[idx]; }
   const std::shared_ptr<AST> &operator[](std::size_t idx) const {
@@ -35,12 +51,12 @@ public:
       return "STRING";
     case Type::BUILTIN:
       return "BUILTIN";
-    case Type::DEFINE:
-      return "DEFINE";
     }
   }
 
   virtual const char *toString() { return TypeToCString(type()); }
+
+  virtual bool isBuiltin(Builtin /* not used */ ) const { return false; } 
 
 private:
   Type type_;
@@ -90,55 +106,13 @@ public:
 
 class ASTBuiltin : public AST {
 public:
-  enum class Operator {
-    ADD,
-    SUB,
-    DIV,
-    MUL,
-    MOD,
-    UNKNOWN,
-    // TODO && || etc
-  };
-  explicit ASTBuiltin(Operator op) : AST(Type::BUILTIN), op_(op) {}
-  Operator op() const { return op_; }
-
-  static const char *operatorToCString(Operator op) {
-    switch (op) {
-    case Operator::ADD:
-      return "+";
-    case Operator::SUB:
-      return "-";
-    case Operator::DIV:
-      return "/";
-    case Operator::MUL:
-      return "*";
-    case Operator::MOD:
-      return "%";
-    case Operator::UNKNOWN:
-      return "UNKNOWN";
-    }
-  }
-
-  static Operator operatorFromCString(const char *str) {
-    if (0 == strcmp("+", str)) {
-      return Operator::ADD;
-    } else if (0 == strcmp("-", str)) {
-      return Operator::SUB;
-    } else if (0 == strcmp("/", str)) {
-      return Operator::DIV;
-    } else if (0 == strcmp("*", str)) {
-      return Operator::MUL;
-    } else if (0 == strcmp("%", str)) {
-      return Operator::MOD;
-    }
-
-    return Operator::UNKNOWN;
-  }
-
-  const char *toString() override { return operatorToCString(op()); }
+  explicit ASTBuiltin(Builtin op) : AST(Type::BUILTIN), op_(op) {}
+  Builtin op() const { return op_; }
+  const char *toString() override { return builtinToCString(op()); }
+  virtual bool isBuiltin(Builtin op) const override { return op == op_; }
 
 private:
-  Operator op_;
+  Builtin op_;
 };
 
 #endif /* !AST_H_ */

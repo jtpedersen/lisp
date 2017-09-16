@@ -95,7 +95,8 @@ TEST(parser, defineSexpr) {
   Lexer l("(define () () )");
   Parser p(l);
   const auto ast = p.read();
-  ASSERT_EQ(AST::Type::DEFINE, ast->type());
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE));
 }
 
 TEST(parser, defineMustHaveArgumentList) {
@@ -131,8 +132,8 @@ TEST(parser, builtinAdd) {
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
   const auto node = std::static_pointer_cast<ASTBuiltin>(first);
-  EXPECT_EQ(ASTBuiltin::Operator::ADD, node->op())
-      << ASTBuiltin::operatorToCString(node->op());
+  EXPECT_EQ(Builtin::ADD, node->op())
+      << builtinToCString(node->op());
 }
 
 TEST(parser, builtinSub) {
@@ -144,8 +145,8 @@ TEST(parser, builtinSub) {
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
   const auto node = std::static_pointer_cast<ASTBuiltin>(first);
-  EXPECT_EQ(ASTBuiltin::Operator::SUB, node->op())
-      << ASTBuiltin::operatorToCString(node->op());
+  EXPECT_EQ(Builtin::SUB, node->op())
+      << builtinToCString(node->op());
 }
 
 TEST(parser, builtinDiv) {
@@ -157,8 +158,8 @@ TEST(parser, builtinDiv) {
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
   const auto node = std::static_pointer_cast<ASTBuiltin>(first);
-  EXPECT_EQ(ASTBuiltin::Operator::DIV, node->op())
-      << ASTBuiltin::operatorToCString(node->op());
+  EXPECT_EQ(Builtin::DIV, node->op())
+      << builtinToCString(node->op());
 }
 
 TEST(parser, builtinMul) {
@@ -170,8 +171,8 @@ TEST(parser, builtinMul) {
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
   const auto node = std::static_pointer_cast<ASTBuiltin>(first);
-  EXPECT_EQ(ASTBuiltin::Operator::MUL, node->op())
-      << ASTBuiltin::operatorToCString(node->op());
+  EXPECT_EQ(Builtin::MUL, node->op())
+      << builtinToCString(node->op());
 }
 
 
@@ -203,6 +204,15 @@ TEST(parser, toStringString) {
   Parser p(l);
   const auto ast = p.read();
   EXPECT_STREQ("\"hest\"", ast->toString());
+}
+
+TEST(parser, listBuiltin) {
+  Lexer l("(list a b c)");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::LIST));
+  ASSERT_EQ(4, ast->children().size());
 }
 
 

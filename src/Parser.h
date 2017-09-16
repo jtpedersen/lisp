@@ -21,7 +21,7 @@ public:
 
 private:
   Lexer lexer;
-
+  void checkSyntaxForBuiltin(AST::List ls) const;
   void syntaxError(const char *msg);
   std::shared_ptr<AST> readSexpr();
   std::shared_ptr<AST> readExpr();
