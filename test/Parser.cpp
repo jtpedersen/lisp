@@ -272,6 +272,34 @@ TEST(parser, joinBuiltin) {
   ASSERT_EQ(3, ast->children().size());
 }
 
+TEST(parser, joinNeedsOperands) {
+  Lexer l("(join)");
+  Parser p(l);
+  try {
+    p.read();
+    FAIL();
+  } catch (SyntaxError &e) {
+    const auto msg = "Builtin requires two operands";
+    EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg))) << e.what();
+  } catch (std::exception &e) {
+    FAIL() << e.what() << " was not expected here";
+  }
+}
+
+TEST(parser, joinNeedsMoreThanOneOperand) {
+  Lexer l("(join (list a))");
+  Parser p(l);
+  try {
+    p.read();
+    FAIL();
+  } catch (SyntaxError &e) {
+    const auto msg = "Builtin requires two operands";
+    EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
+  } catch (std::exception &e) {
+    FAIL() << e.what() << " was not expected here";
+  }
+}
+
 
 
 int main(int argc, char **argv) {
