@@ -76,6 +76,12 @@ void Parser::checkSyntaxForBuiltin(AST::List ls) const {
     break;
   }
   case Builtin::LIST:
+    break;
+  case Builtin::HEAD:
+    if (1 == ls.size()) {
+      throw SyntaxError("Builtin requires operands", first);
+    }
+    break;
   case Builtin::UNKNOWN:
     break;
   }

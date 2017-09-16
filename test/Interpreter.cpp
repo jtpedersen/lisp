@@ -137,7 +137,7 @@ TEST_F(InterpreterTest, mulMany) {
   load("(* 1 1 1 1 1 1 1)");
   const auto res = eval(program);
   ASSERT_EQ(8, program->children().size());
-  ASSERT_EQ(res->type(), AST::Type::INTEGER );
+  ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
   EXPECT_EQ(1, i->data());
 }
@@ -197,7 +197,39 @@ TEST_F(InterpreterTest, emptyList) {
   EXPECT_EQ(res->children().size(), 0);
 }
 
+TEST_F(InterpreterTest, head) {
+  load("(head (list a))");
+  const auto res = eval(program);
+  ASSERT_NE(nullptr, res);
+  EXPECT_EQ(res->type(), AST::Type::SYMBOL);
+}
 
+TEST_F(InterpreterTest, headMultipleArgs) {
+  load("(head (list a) (list b))");
+  try {
+    eval(program);
+    FAIL();
+  } catch (SyntaxError &e) {
+  }
+}
+
+TEST_F(InterpreterTest, headOnlyOnList) {
+  load("(head 123)");
+  try {
+    eval(program);
+    FAIL();
+  } catch (SyntaxError &e) {
+  }
+}
+
+TEST_F(InterpreterTest, headNotOnEmptyList) {
+  load("(head (list))");
+  try {
+    eval(program);
+    FAIL();
+  } catch (SyntaxError &e) {
+  }
+}
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

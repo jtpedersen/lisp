@@ -41,9 +41,19 @@ std::shared_ptr<AST> evalBuiltin(AST::List ls) {
   }
   if (op == Builtin::LIST) {
     auto ret = std::make_shared<ASTBuiltin>(Builtin::LIST);
-    AST::List children(ls.begin()+1, ls.end());
+    AST::List children(ls.begin() + 1, ls.end());
     ret->setChildren(children);
     return ret;
+  } else if (op == Builtin::HEAD) {
+    if (2 != ls.size()) {
+      throw SyntaxError("Head requires exactly one argument", opnode);
+    }
+
+    if (!ls[1]->isBuiltin(Builtin::LIST))
+      throw SyntaxError("Head only works on lists", opnode);
+    if (0 == ls[1]->children().size())
+      throw SyntaxError("Head on empty list", opnode);
+    return eval(ls[1]->children()[0]);
   }
   return nullptr;
 }

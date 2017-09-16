@@ -16,6 +16,8 @@ const char *builtinToCString(Builtin op) {
     return "define";
   case Builtin::LIST:
     return "list";
+  case Builtin::HEAD:
+    return "head";
   case Builtin::UNKNOWN:
     return "UNKNOWN";
   }
@@ -38,6 +40,8 @@ Builtin builtinFromCString(const char *str) {
     return Builtin::DEFINE;
   } else if (0 == strcmp("list", str)) {
     return Builtin::LIST;
+  } else if (0 == strcmp("head", str)) {
+    return Builtin::HEAD;
   }
   return Builtin::UNKNOWN;
 }

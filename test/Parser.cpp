@@ -216,6 +216,28 @@ TEST(parser, listBuiltin) {
 }
 
 
+TEST(parser, headBuiltin) {
+  Lexer l("(head (list a))");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::HEAD));
+  ASSERT_EQ(2, ast->children().size());
+}
+
+TEST(parser, headNeepsOperands) {
+  Lexer l("(head)");
+  Parser p(l);
+  try {
+    p.read();
+    FAIL();
+  } catch (SyntaxError &e) {
+    const auto msg = "Builtin requires operands";
+    EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
+  } catch (std::exception &e) {
+    FAIL() << e.what() << " was not expected here";
+  }
+}
 
 
 int main(int argc, char **argv) {

@@ -12,6 +12,7 @@ enum class Builtin {
   MOD,
   DEFINE,
   LIST,
+  HEAD,
   UNKNOWN,
   // TODO && || etc
 };
@@ -52,6 +53,7 @@ public:
     case Type::BUILTIN:
       return "BUILTIN";
     }
+    return "WHAT HAVE YOU DONE";
   }
 
   virtual const char *toString() { return TypeToCString(type()); }
