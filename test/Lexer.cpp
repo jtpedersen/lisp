@@ -156,6 +156,13 @@ TEST(lexer, minusIsSymbol) {
   EXPECT_STREQ("-", l.string()) << l.string();
 }
 
+TEST(lexer, DISABLED_lineComment) {
+  // requires a comment begin token and end line token as ; can be part of a
+  // valid symbol ? or...
+  const auto str = "; 123";
+  Lexer l(str);
+  ASSERT_EQ(Lexer::TokenType::TOKEN_EOF, l.nextToken()) << l.string();
+}
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

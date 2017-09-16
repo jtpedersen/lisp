@@ -18,6 +18,10 @@ const char *builtinToCString(Builtin op) {
     return "list";
   case Builtin::HEAD:
     return "head";
+  case Builtin::TAIL:
+    return "tail";
+  case Builtin::JOIN:
+    return "join";
   case Builtin::UNKNOWN:
     return "UNKNOWN";
   }
@@ -42,6 +46,10 @@ Builtin builtinFromCString(const char *str) {
     return Builtin::LIST;
   } else if (0 == strcmp("head", str)) {
     return Builtin::HEAD;
+  } else if (0 == strcmp("tail", str)) {
+    return Builtin::TAIL;
+  } else if (0 == strcmp("join", str)) {
+    return Builtin::JOIN;
   }
   return Builtin::UNKNOWN;
 }

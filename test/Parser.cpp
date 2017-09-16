@@ -124,11 +124,11 @@ TEST(parser, defineMustHaveBody) {
 }
 
 TEST(parser, builtinAdd) {
-  Lexer l("(+)");
+  Lexer l("(+ 1 2)");
   Parser p(l);
   const auto ast = p.read();
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
-  ASSERT_EQ(1, ast->children().size());
+  ASSERT_EQ(3, ast->children().size());
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
   const auto node = std::static_pointer_cast<ASTBuiltin>(first);
@@ -137,11 +137,11 @@ TEST(parser, builtinAdd) {
 }
 
 TEST(parser, builtinSub) {
-  Lexer l("(-)");
+  Lexer l("(- 1 2)");
   Parser p(l);
   const auto ast = p.read();
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
-  ASSERT_EQ(1, ast->children().size());
+  ASSERT_EQ(3, ast->children().size());
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
   const auto node = std::static_pointer_cast<ASTBuiltin>(first);
@@ -150,11 +150,11 @@ TEST(parser, builtinSub) {
 }
 
 TEST(parser, builtinDiv) {
-  Lexer l("(/)");
+  Lexer l("(/ 10 10)");
   Parser p(l);
   const auto ast = p.read();
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
-  ASSERT_EQ(1, ast->children().size());
+  ASSERT_EQ(3, ast->children().size());
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
   const auto node = std::static_pointer_cast<ASTBuiltin>(first);
@@ -163,11 +163,11 @@ TEST(parser, builtinDiv) {
 }
 
 TEST(parser, builtinMul) {
-  Lexer l("(*)");
+  Lexer l("(* 0 0)");
   Parser p(l);
   const auto ast = p.read();
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
-  ASSERT_EQ(1, ast->children().size());
+  ASSERT_EQ(3, ast->children().size());
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
   const auto node = std::static_pointer_cast<ASTBuiltin>(first);
@@ -238,6 +238,40 @@ TEST(parser, headNeepsOperands) {
     FAIL() << e.what() << " was not expected here";
   }
 }
+
+
+TEST(parser, tailBuiltin) {
+  Lexer l("(tail (list a))");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::TAIL));
+  ASSERT_EQ(2, ast->children().size());
+}
+
+TEST(parser, tailNeepsOperands) {
+  Lexer l("(tail)");
+  Parser p(l);
+  try {
+    p.read();
+    FAIL();
+  } catch (SyntaxError &e) {
+    const auto msg = "Builtin requires operands";
+    EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
+  } catch (std::exception &e) {
+    FAIL() << e.what() << " was not expected here";
+  }
+}
+
+TEST(parser, joinBuiltin) {
+  Lexer l("(join (list a) (list b))");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::JOIN));
+  ASSERT_EQ(3, ast->children().size());
+}
+
 
 
 int main(int argc, char **argv) {

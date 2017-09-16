@@ -65,9 +65,14 @@ void Parser::checkSyntaxForBuiltin(AST::List ls) const {
   case Builtin::DIV:
   case Builtin::MUL:
   case Builtin::MOD:
-
+  case Builtin::HEAD:
+  case Builtin::TAIL:
+    if (1 == ls.size()) {
+      throw SyntaxError("Builtin requires operands", first);
+    }
     break;
-  case Builtin::DEFINE: {
+
+    case Builtin::DEFINE: {
     if (1 == ls.size()) {
       throw SyntaxError("Define must have argumentlist and body", first);
     } else if (2 == ls.size()) {
@@ -76,11 +81,6 @@ void Parser::checkSyntaxForBuiltin(AST::List ls) const {
     break;
   }
   case Builtin::LIST:
-    break;
-  case Builtin::HEAD:
-    if (1 == ls.size()) {
-      throw SyntaxError("Builtin requires operands", first);
-    }
     break;
   case Builtin::UNKNOWN:
     break;

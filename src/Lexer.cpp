@@ -13,9 +13,16 @@ Lexer::TokenType Lexer::nextToken() {
   nextChar();
   if (!good)
     return TokenType::TOKEN_EOF;
+  // if (';' == current) {
+  //   while (current != '\n') {
+  //     nextChar();
+  //     if (!good)
+  //       return TokenType::TOKEN_EOF;
+  //   }
+  // }
   if (isspace(current))
     return nextToken();
-  // printf("c %c\n", c);
+
   switch (current) {
   case '\0':
     return TokenType::TOKEN_EOF;
@@ -78,8 +85,10 @@ Lexer::TokenType Lexer::readAtom() {
       break;
   } while (nextChar());
 
-  if (isdigit(buffer.front())) return TokenType::INTEGER;
-  if ('-' == buffer.front() && buffer.size() > 1) return TokenType::INTEGER;
+  if (isdigit(buffer.front()))
+    return TokenType::INTEGER;
+  if ('-' == buffer.front() && buffer.size() > 1)
+    return TokenType::INTEGER;
   return TokenType::SYMBOL;
 }
 

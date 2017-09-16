@@ -13,6 +13,8 @@ enum class Builtin {
   DEFINE,
   LIST,
   HEAD,
+  TAIL,
+  JOIN,
   UNKNOWN,
   // TODO && || etc
 };

@@ -112,7 +112,7 @@ TEST_F(InterpreterTest, numericMustHaveArg) {
     eval(program);
     FAIL();
   } catch (SyntaxError &e) {
-    const auto msg = "Expected operators for operator";
+    const auto msg = "Builtin requires operands";
     EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
   } catch (std::exception &e) {
     FAIL() << e.what();
@@ -229,6 +229,48 @@ TEST_F(InterpreterTest, headNotOnEmptyList) {
     FAIL();
   } catch (SyntaxError &e) {
   }
+}
+
+TEST_F(InterpreterTest, tail) {
+  load("(tail (list a))");
+  const auto res = eval(program);
+  ASSERT_NE(nullptr, res);
+  EXPECT_EQ(res->type(), AST::Type::SYMBOL);
+}
+
+TEST_F(InterpreterTest, tailMultipleArgs) {
+  load("(tail (list a) (list b))");
+  try {
+    eval(program);
+    FAIL();
+  } catch (SyntaxError &e) {
+  }
+}
+
+TEST_F(InterpreterTest, tailOnlyOnList) {
+  load("(tail 123)");
+  try {
+    eval(program);
+    FAIL();
+  } catch (SyntaxError &e) {
+  }
+}
+
+TEST_F(InterpreterTest, tailNotOnEmptyList) {
+  load("(tail (list))");
+  try {
+    eval(program);
+    FAIL();
+  } catch (SyntaxError &e) {
+  }
+}
+
+TEST_F(InterpreterTest, joinBuiltin) {
+  load("(join (list a) (list b))");
+  const auto res = eval(program);
+  ASSERT_NE(nullptr, res);
+  EXPECT_TRUE(res->isBuiltin(Builtin::LIST)) << res->toString();
+  EXPECT_EQ(2, res->children().size()) << res->toString();
 }
 
 int main(int argc, char **argv) {
