@@ -178,6 +178,17 @@ TEST_F(InterpreterTest, modSome) {
   EXPECT_EQ(1, i->data());
 }
 
+TEST_F(InterpreterTest, listBuiltin) {
+  load("(list a b c)");
+  const auto res = eval(program);
+  ASSERT_NE(nullptr, res);
+  EXPECT_EQ(res->type(), AST::Type::SEXPR);
+  EXPECT_EQ(res->children().size(), 3);
+  EXPECT_EQ(res->head()->type(), AST::Type::SYMBOL);
+}
+
+
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
