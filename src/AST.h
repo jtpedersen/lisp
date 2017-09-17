@@ -30,6 +30,7 @@ public:
   enum class Type { SEXPR, SYMBOL, INTEGER, STRING, BUILTIN };
 
   explicit AST(Type type) : type_(type) {}
+  virtual ~AST() {};
 
   Type type() const { return type_; };
   void setType(const Type &type) { type_ = type; };
@@ -62,7 +63,7 @@ public:
 
   virtual const char *toString() { return TypeToCString(type()); }
 
-  virtual bool isBuiltin(Builtin /* not used */ ) const { return false; } 
+  virtual bool isBuiltin(Builtin /* not used */) const { return false; }
 
 private:
   Type type_;
@@ -80,7 +81,7 @@ public:
   explicit ASTDataNode(const DataType &data) : AST(TypeType), data_(data) {}
   const DataType &data() const { return data_; };
 
-private:
+protected:
   DataType data_;
 };
 
@@ -94,15 +95,21 @@ public:
   }
 };
 
-class ASTSymbol : public ASTDataNode<const char *, AST::Type::SYMBOL> {
+class ASTSymbol : public ASTDataNode<char *, AST::Type::SYMBOL> {
 public:
-  explicit ASTSymbol(const char *data) : ASTDataNode(data){};
-  const char *toString() override { return data(); }
+  explicit ASTSymbol(const char *data) : ASTDataNode(strdup(data)){};
+  virtual ~ASTSymbol() { free(data_);};
+  const char *toString() override {
+    char buf[1024];
+    snprintf(buf, 1024, "%s", data());
+    return strdup(buf);
+  }
 };
 
-class ASTString : public ASTDataNode<const char *, AST::Type::STRING> {
+class ASTString : public ASTDataNode<char *, AST::Type::STRING> {
 public:
-  explicit ASTString(const char *data) : ASTDataNode(data){};
+  explicit ASTString(const char *data) : ASTDataNode(strdup(data)){};
+  virtual ~ASTString() { free(data_);};
   const char *toString() override {
     char buf[1024];
     snprintf(buf, 1024, "\"%s\"", data());
@@ -116,7 +123,6 @@ public:
   Builtin op() const { return op_; }
   const char *toString() override { return builtinToCString(op()); }
   virtual bool isBuiltin(Builtin op) const override { return op == op_; }
-
 
 private:
   Builtin op_;

@@ -6,6 +6,7 @@ add_library(
   Interpreter.cpp
   SyntaxError.cpp
   AST.cpp
+  Environment.cpp
   )
 
 add_executable(
