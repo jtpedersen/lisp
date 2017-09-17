@@ -16,9 +16,7 @@ protected:
     program = p.read();
   }
 
-  std::shared_ptr<AST> eval() {
-    return interpreter.eval(program);
-  }
+  std::shared_ptr<AST> eval() { return interpreter.eval(program); }
   std::shared_ptr<AST> program;
   Interpreter interpreter;
 };
@@ -350,13 +348,21 @@ TEST_F(InterpreterTest, defineAffectsEnv) {
     EXPECT_EQ(0, res->children().size()) << res->toString();
   }
   {
-    load("(+ x x)");
+    load("(+ (x) (x))");
     const auto res = eval();
-    // ASSERT_NE(nullptr, res);
-    // EXPECT_EQ(0, res->children().size()) << res->toString();
-    // const auto i = std::static_pointer_cast<ASTInt>(res);
-    // EXPECT_EQ(4, i->data());
+    ASSERT_NE(nullptr, res);
+    EXPECT_EQ(0, res->children().size()) << res->toString();
+    const auto i = std::static_pointer_cast<ASTInt>(res);
+    EXPECT_EQ(4, i->data());
   }
+}
+
+TEST_F(InterpreterTest, defineBindsArgs) {
+  load("(define (f y) (+ y 1))");
+  auto res = eval();
+  ASSERT_NE(nullptr, res);
+  load("(f 2)");
+  res = eval();
 }
 
 int main(int argc, char **argv) {

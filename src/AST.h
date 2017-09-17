@@ -27,10 +27,10 @@ Builtin builtinFromCString(const char *str);
 class AST {
 public:
   using List = std::vector<std::shared_ptr<AST>>;
-  enum class Type { SEXPR, SYMBOL, INTEGER, STRING, BUILTIN };
+  enum class Type { SEXPR, SYMBOL, INTEGER, STRING, BUILTIN, FUN };
 
   explicit AST(Type type) : type_(type) {}
-  virtual ~AST() {};
+  virtual ~AST(){};
 
   Type type() const { return type_; };
   void setType(const Type &type) { type_ = type; };
@@ -57,6 +57,8 @@ public:
       return "STRING";
     case Type::BUILTIN:
       return "BUILTIN";
+    case Type::FUN:
+      return "FUN";
     }
     return "WHAT HAVE YOU DONE";
   }
@@ -95,10 +97,10 @@ public:
   }
 };
 
-class ASTSymbol : public ASTDataNode<char *, AST::Type::SYMBOL> {
+class ASTSymbol : public ASTDataNode<const char *, AST::Type::SYMBOL> {
 public:
   explicit ASTSymbol(const char *data) : ASTDataNode(strdup(data)){};
-  virtual ~ASTSymbol() { free(data_);};
+  virtual ~ASTSymbol() { free(const_cast<char *>(data_)); };
   const char *toString() override {
     char buf[1024];
     snprintf(buf, 1024, "%s", data());
@@ -106,10 +108,10 @@ public:
   }
 };
 
-class ASTString : public ASTDataNode<char *, AST::Type::STRING> {
+class ASTString : public ASTDataNode<const char *, AST::Type::STRING> {
 public:
   explicit ASTString(const char *data) : ASTDataNode(strdup(data)){};
-  virtual ~ASTString() { free(data_);};
+  virtual ~ASTString() { free(const_cast<char *>(data_)); };
   const char *toString() override {
     char buf[1024];
     snprintf(buf, 1024, "\"%s\"", data());
@@ -126,6 +128,13 @@ public:
 
 private:
   Builtin op_;
+};
+
+class ASTFun : public AST {
+public:
+  explicit ASTFun() : AST(Type::FUN) {}
+
+private:
 };
 
 #endif /* !AST_H_ */

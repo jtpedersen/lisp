@@ -40,6 +40,10 @@ void print(const std::shared_ptr<AST> &node) {
   case Type::BUILTIN:
     cout << node->toString();
     break;
+  case Type::FUN:
+    cout << "<function>: ";
+    printList(node->children());
+    break;
   }
 }
 
