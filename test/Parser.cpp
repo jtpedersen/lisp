@@ -310,6 +310,16 @@ TEST(parser, evalBuiltin) {
   ASSERT_EQ(2, ast->children().size());
 }
 
+TEST(parser, pprintBuiltin) {
+  Lexer l("(pprint 2)");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::PPRINT));
+  ASSERT_EQ(2, ast->children().size());
+}
+
+
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

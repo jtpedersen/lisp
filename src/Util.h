@@ -12,7 +12,8 @@
 namespace util {
 std::vector<Lexer::TokenType> tokenizeFile(std::string file);
 
-void print(std::shared_ptr<AST> node);
+void print(const std::shared_ptr<AST> &node);
+void printList(const AST::List &ls);
 }
 
 namespace std {

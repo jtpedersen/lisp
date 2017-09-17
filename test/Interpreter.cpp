@@ -301,6 +301,17 @@ TEST_F(InterpreterTest, evalMultiArgs) {
   }
 }
 
+TEST_F(InterpreterTest, pprintAtom) {
+  load("(pprint 123)");
+  const auto res = eval(program);
+  ASSERT_NE(nullptr, res);
+  ASSERT_EQ(res->type(), AST::Type::INTEGER) << res->toString();
+  EXPECT_EQ(0, res->children().size()) << res->toString();
+  const auto i = std::static_pointer_cast<ASTInt>(res);
+  EXPECT_EQ(123, i->data());
+}
+
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

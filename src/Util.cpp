@@ -23,22 +23,14 @@ std::vector<Lexer::TokenType> tokenizeFile(std::string file) {
   return res;
 }
 
-void print(std::shared_ptr<AST> node) {
+void print(const std::shared_ptr<AST> &node) {
   assert(node);
   using namespace std;
   using Type = AST::Type;
   switch (node->type()) {
   case Type::SEXPR: {
     cout << "(";
-    bool first = true;
-    for (const auto &child : node->children()) {
-      if (!first) {
-        cout << " ";
-      } else {
-        first = false;
-      }
-      print(child);
-    }
+    printList(node->children());
     cout << ")";
     break;
   }
@@ -48,6 +40,20 @@ void print(std::shared_ptr<AST> node) {
   case Type::BUILTIN:
     cout << node->toString();
     break;
+  }
+}
+
+void printList(const AST::List &ls) {
+  using namespace std;
+
+  bool first = true;
+  for (const auto &child : ls) {
+    if (!first) {
+      cout << " ";
+    } else {
+      first = false;
+    }
+    print(child);
   }
 }
 

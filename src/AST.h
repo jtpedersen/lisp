@@ -16,6 +16,7 @@ enum class Builtin {
   TAIL,
   JOIN,
   EVAL,
+  PPRINT,
   UNKNOWN,
   // TODO && || etc
 };

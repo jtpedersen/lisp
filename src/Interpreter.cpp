@@ -26,9 +26,9 @@ static int applyIntOp(const int acc, const AST::List ls, const size_t idx,
                       std::function<int(const int, const int)> op);
 
 std::shared_ptr<AST> eval(std::shared_ptr<AST> node) {
-  std::cout << "EVAL: ";
-  util::print(node);
-  std::cout << std::endl;
+  // std::cout << "EVAL: ";
+  // util::print(node);
+  // std::cout << std::endl;
 
   if (node->children().size() == 0)
     return node;
@@ -74,8 +74,14 @@ std::shared_ptr<AST> evalBuiltin(AST::List ls) {
     requireSingleArgument(opnode, ls);
     const auto node = eval(ls[1]);
     return eval(node);
+  } else if (op == Builtin::PPRINT) {
+    requireSingleArgument(opnode, ls);
+    const auto node = ls[1];
+    util::print(node);
+    std::cout << std::endl;
+    return eval(node);
   }
-
+  throw SyntaxError("Unimplemented builtin", opnode);
   return nullptr;
 }
 

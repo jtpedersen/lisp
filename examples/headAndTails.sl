@@ -5,6 +5,5 @@
 (tail (list (list a b) "hest" ))
 (head (list + -)) 
 (eval (list + 1 2))
-(head (eval (head (list (list a b) "hest" ))))
-(head (list + -))
-(eval (join (list (head (list + -))) (list 1 2)))
+(list (head (list "hest")))
+(eval (pprint(join (list +) (list 2 3))))
