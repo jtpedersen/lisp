@@ -14,6 +14,8 @@ int main(int argc, char *argv[]) {
   cout << "Velcome to shader lisp (built " << __DATE__ << ":" << __TIME__
        << ")\n"
        << PROMPT;
+  Interpreter interpreter;
+
   while (getline(cin, line)) {
     try {
       Lexer l(line.c_str());
@@ -21,7 +23,7 @@ int main(int argc, char *argv[]) {
       const auto program = p.read();
       util::print(program);
       cout << "\n";
-      cout << "\t" << eval(program)->toString() << endl;
+      cout << "\t" << interpreter.eval(program)->toString() << endl;
       cout << "\n" << PROMPT;
     } catch (const exception &e) {
       cout << "Error occurred: " << e.what() << endl;

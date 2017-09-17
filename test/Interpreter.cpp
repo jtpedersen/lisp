@@ -15,26 +15,31 @@ protected:
     Parser p(l);
     program = p.read();
   }
+
+  std::shared_ptr<AST> eval() {
+    return interpreter.eval(program);
+  }
   std::shared_ptr<AST> program;
+  Interpreter interpreter;
 };
 
 TEST_F(InterpreterTest, minimal) {
   load("12");
-  const auto res = eval(program);
+  const auto res = eval();
   EXPECT_EQ(program->type(), res->type());
   EXPECT_STREQ(program->toString(), res->toString());
 }
 
 TEST_F(InterpreterTest, minimalEmpty) {
   load("()");
-  const auto res = eval(program);
+  const auto res = eval();
   EXPECT_EQ(program->type(), res->type());
   EXPECT_STREQ(program->toString(), res->toString());
 }
 
 TEST_F(InterpreterTest, minimalAdd) {
   load("(+ 1 1)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_EQ(3, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
@@ -43,7 +48,7 @@ TEST_F(InterpreterTest, minimalAdd) {
 
 TEST_F(InterpreterTest, addIdentity) {
   load("(+ 0)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_EQ(2, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
@@ -52,7 +57,7 @@ TEST_F(InterpreterTest, addIdentity) {
 
 TEST_F(InterpreterTest, addMany) {
   load("(+ 1 1 1 1 1 1 1)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_EQ(8, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
@@ -61,7 +66,7 @@ TEST_F(InterpreterTest, addMany) {
 
 TEST_F(InterpreterTest, minimalSub) {
   load("(- 2 1)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_NE(nullptr, res);
   ASSERT_EQ(3, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
@@ -71,7 +76,7 @@ TEST_F(InterpreterTest, minimalSub) {
 
 TEST_F(InterpreterTest, subMany) {
   load("(- 6 1 1 1 1 1 1)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_EQ(8, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
@@ -80,7 +85,7 @@ TEST_F(InterpreterTest, subMany) {
 
 TEST_F(InterpreterTest, oneLevelDown) {
   load("(+ (+ 1 1) (- 1 1))");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_EQ(3, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
@@ -89,7 +94,7 @@ TEST_F(InterpreterTest, oneLevelDown) {
 
 TEST_F(InterpreterTest, oneLevelDown2) {
   load("(+ (+ 1 1) 2)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_EQ(3, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
@@ -98,7 +103,7 @@ TEST_F(InterpreterTest, oneLevelDown2) {
 
 TEST_F(InterpreterTest, minimalMul) {
   load("(* 2 3)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_EQ(3, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
@@ -109,7 +114,7 @@ TEST_F(InterpreterTest, numericMustHaveArg) {
   try {
     load("(+)");
     ASSERT_NE(nullptr, program);
-    eval(program);
+    eval();
     FAIL();
   } catch (SyntaxError &e) {
     const auto msg = "Builtin requires operands";
@@ -123,7 +128,7 @@ TEST_F(InterpreterTest, builtinIntOpMustHaveIntArgs) {
   try {
     load("(+ \"hest\")");
     ASSERT_NE(nullptr, program);
-    eval(program);
+    eval();
     FAIL();
   } catch (SyntaxError &e) {
     const auto msg = "Operator works only on integer types";
@@ -135,7 +140,7 @@ TEST_F(InterpreterTest, builtinIntOpMustHaveIntArgs) {
 
 TEST_F(InterpreterTest, mulMany) {
   load("(* 1 1 1 1 1 1 1)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_EQ(8, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
@@ -144,7 +149,7 @@ TEST_F(InterpreterTest, mulMany) {
 
 TEST_F(InterpreterTest, minimalDiv) {
   load("(/ 4 2)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_EQ(3, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
@@ -153,7 +158,7 @@ TEST_F(InterpreterTest, minimalDiv) {
 
 TEST_F(InterpreterTest, divSome) {
   load("(/ 8 4 2)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_EQ(4, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
@@ -162,7 +167,7 @@ TEST_F(InterpreterTest, divSome) {
 
 TEST_F(InterpreterTest, minimalMod) {
   load("(% 22 10)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_EQ(3, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
@@ -171,7 +176,7 @@ TEST_F(InterpreterTest, minimalMod) {
 
 TEST_F(InterpreterTest, modSome) {
   load("(% 13 4 2)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_EQ(4, program->children().size());
   ASSERT_EQ(res->type(), AST::Type::INTEGER);
   const auto i = std::static_pointer_cast<ASTInt>(res);
@@ -180,7 +185,7 @@ TEST_F(InterpreterTest, modSome) {
 
 TEST_F(InterpreterTest, listBuiltin) {
   load("(list a b c)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_NE(nullptr, res);
   EXPECT_EQ(res->type(), AST::Type::BUILTIN);
   EXPECT_TRUE(res->isBuiltin(Builtin::LIST));
@@ -190,7 +195,7 @@ TEST_F(InterpreterTest, listBuiltin) {
 
 TEST_F(InterpreterTest, emptyList) {
   load("(list)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_NE(nullptr, res);
   EXPECT_EQ(res->type(), AST::Type::BUILTIN);
   EXPECT_TRUE(res->isBuiltin(Builtin::LIST));
@@ -199,7 +204,7 @@ TEST_F(InterpreterTest, emptyList) {
 
 TEST_F(InterpreterTest, head) {
   load("(head (list a))");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_NE(nullptr, res);
   EXPECT_EQ(res->type(), AST::Type::SYMBOL);
 }
@@ -207,7 +212,7 @@ TEST_F(InterpreterTest, head) {
 TEST_F(InterpreterTest, headMultipleArgs) {
   load("(head (list a) (list b))");
   try {
-    eval(program);
+    eval();
     FAIL();
   } catch (SyntaxError &e) {
   }
@@ -216,7 +221,7 @@ TEST_F(InterpreterTest, headMultipleArgs) {
 TEST_F(InterpreterTest, headOnlyOnList) {
   load("(head 123)");
   try {
-    eval(program);
+    eval();
     FAIL();
   } catch (SyntaxError &e) {
   }
@@ -225,7 +230,7 @@ TEST_F(InterpreterTest, headOnlyOnList) {
 TEST_F(InterpreterTest, headNotOnEmptyList) {
   load("(head (list))");
   try {
-    eval(program);
+    eval();
     FAIL();
   } catch (SyntaxError &e) {
   }
@@ -233,7 +238,7 @@ TEST_F(InterpreterTest, headNotOnEmptyList) {
 
 TEST_F(InterpreterTest, tail) {
   load("(tail (list a))");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_NE(nullptr, res);
   EXPECT_EQ(res->type(), AST::Type::SYMBOL);
 }
@@ -241,7 +246,7 @@ TEST_F(InterpreterTest, tail) {
 TEST_F(InterpreterTest, tailMultipleArgs) {
   load("(tail (list a) (list b))");
   try {
-    eval(program);
+    eval();
     FAIL();
   } catch (SyntaxError &e) {
   }
@@ -250,7 +255,7 @@ TEST_F(InterpreterTest, tailMultipleArgs) {
 TEST_F(InterpreterTest, tailOnlyOnList) {
   load("(tail 123)");
   try {
-    eval(program);
+    eval();
     FAIL();
   } catch (SyntaxError &e) {
   }
@@ -259,7 +264,7 @@ TEST_F(InterpreterTest, tailOnlyOnList) {
 TEST_F(InterpreterTest, tailNotOnEmptyList) {
   load("(tail (list))");
   try {
-    eval(program);
+    eval();
     FAIL();
   } catch (SyntaxError &e) {
   }
@@ -267,7 +272,7 @@ TEST_F(InterpreterTest, tailNotOnEmptyList) {
 
 TEST_F(InterpreterTest, joinBuiltin) {
   load("(join (list a) (list b))");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_NE(nullptr, res);
   EXPECT_TRUE(res->isBuiltin(Builtin::LIST)) << res->toString();
   EXPECT_EQ(2, res->children().size()) << res->toString();
@@ -276,7 +281,7 @@ TEST_F(InterpreterTest, joinBuiltin) {
 TEST_F(InterpreterTest, joinRequiresAtLeastTwo) {
   try {
     load("(join (list))");
-    eval(program);
+    eval();
     FAIL();
   } catch (SyntaxError &e) {
   }
@@ -284,7 +289,7 @@ TEST_F(InterpreterTest, joinRequiresAtLeastTwo) {
 
 TEST_F(InterpreterTest, joinManyLists) {
   load("(join (list a) (list b) (list c) (list d))");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_NE(nullptr, res);
   EXPECT_TRUE(res->isBuiltin(Builtin::LIST)) << res->toString();
   EXPECT_EQ(4, res->children().size()) << res->toString();
@@ -292,7 +297,7 @@ TEST_F(InterpreterTest, joinManyLists) {
 
 TEST_F(InterpreterTest, evalBuiltin) {
   load("(eval (list + 1 2))");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_NE(nullptr, res);
   ASSERT_EQ(res->type(), AST::Type::INTEGER) << res->toString();
   EXPECT_EQ(0, res->children().size()) << res->toString();
@@ -303,7 +308,7 @@ TEST_F(InterpreterTest, evalBuiltin) {
 TEST_F(InterpreterTest, evalMultiArgs) {
   load("(eval (list - 1 1) \"hest\")");
   try {
-    eval(program);
+    eval();
     FAIL();
   } catch (SyntaxError &e) {
   }
@@ -312,7 +317,7 @@ TEST_F(InterpreterTest, evalMultiArgs) {
 TEST_F(InterpreterTest, evalNotOnAtom) {
   load("(eval \"hest\")");
   try {
-    eval(program);
+    eval();
     FAIL();
   } catch (SyntaxError &e) {
   }
@@ -320,7 +325,7 @@ TEST_F(InterpreterTest, evalNotOnAtom) {
 
 TEST_F(InterpreterTest, pprintAtom) {
   load("(pprint 123)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_NE(nullptr, res);
   ASSERT_EQ(res->type(), AST::Type::INTEGER) << res->toString();
   EXPECT_EQ(0, res->children().size()) << res->toString();
@@ -330,7 +335,7 @@ TEST_F(InterpreterTest, pprintAtom) {
 
 TEST_F(InterpreterTest, defineBuiltin) {
   load("(define (x) 2)");
-  const auto res = eval(program);
+  const auto res = eval();
   ASSERT_NE(nullptr, res);
   ASSERT_EQ(res->type(), AST::Type::SEXPR) << res->toString();
   EXPECT_EQ(0, res->children().size()) << res->toString();
@@ -339,14 +344,14 @@ TEST_F(InterpreterTest, defineBuiltin) {
 TEST_F(InterpreterTest, defineAffectsEnv) {
   {
     load("(define (x) 2)");
-    const auto res = eval(program);
+    const auto res = eval();
     ASSERT_NE(nullptr, res);
     ASSERT_EQ(res->type(), AST::Type::SEXPR) << res->toString();
     EXPECT_EQ(0, res->children().size()) << res->toString();
   }
   {
     load("(+ x x)");
-    const auto res = eval(program);
+    const auto res = eval();
     // ASSERT_NE(nullptr, res);
     // EXPECT_EQ(0, res->children().size()) << res->toString();
     // const auto i = std::static_pointer_cast<ASTInt>(res);

@@ -7,28 +7,9 @@
 #include <functional>
 #include <iostream>
 
-static std::shared_ptr<AST> evalIntOp(Builtin intOp, AST::List ls);
-static std::shared_ptr<AST> evalBuiltin(AST::List ls);
-static void requireIntType(std::shared_ptr<AST> node);
-static bool isIntOp(Builtin op);
+Interpreter::Interpreter() : env(std::make_shared<Environment>()) {}
 
-static std::shared_ptr<AST> getSingleListArg(const std::shared_ptr<AST> &opnode,
-                                             const AST::List &ls);
-
-static void requireSingleArgument(const std::shared_ptr<AST> &opnode,
-                                  AST::List ls);
-
-static void requireListType(const std::shared_ptr<AST> &opnode,
-                            std::shared_ptr<AST> node);
-static void requireNonEmptyList(const std::shared_ptr<AST> &opnode,
-                                std::shared_ptr<AST> node);
-
-static int applyIntOp(const int acc, const AST::List ls, const size_t idx,
-                      std::function<int(const int, const int)> op);
-
-static std::shared_ptr<Environment> env = std::make_shared<Environment>();
-
-std::shared_ptr<AST> eval(std::shared_ptr<AST> node) {
+std::shared_ptr<AST> Interpreter::eval(std::shared_ptr<AST> node) {
   // std::cout << "EVAL: ";
   // util::print(node);
   // std::cout << std::endl;
@@ -56,7 +37,7 @@ std::shared_ptr<AST> eval(std::shared_ptr<AST> node) {
   return nullptr;
 }
 
-std::shared_ptr<AST> evalBuiltin(AST::List ls) {
+std::shared_ptr<AST> Interpreter::evalBuiltin(AST::List ls) {
   if (ls.front()->type() != AST::Type::BUILTIN) {
     throw SyntaxError("Expected builtin", ls.front());
   }
@@ -108,7 +89,7 @@ std::shared_ptr<AST> evalBuiltin(AST::List ls) {
   return nullptr;
 }
 
-std::shared_ptr<AST> evalIntOp(Builtin intOp, AST::List ls) {
+std::shared_ptr<AST> Interpreter::evalIntOp(Builtin intOp, AST::List ls) {
   if (ls.size() == 1)
     throw SyntaxError("Expected operators for operator", ls.front());
 
@@ -135,8 +116,8 @@ std::shared_ptr<AST> evalIntOp(Builtin intOp, AST::List ls) {
   return std::make_shared<ASTInt>(applyIntOp(firstVal, ls, 2, op));
 }
 
-int applyIntOp(const int acc, const AST::List ls, const size_t idx,
-               std::function<int(const int, const int)> op) {
+int Interpreter::applyIntOp(const int acc, const AST::List ls, const size_t idx,
+                            std::function<int(const int, const int)> op) {
   if (ls.size() == idx)
     return acc;
   const auto n = eval(ls[idx]);
@@ -145,7 +126,7 @@ int applyIntOp(const int acc, const AST::List ls, const size_t idx,
   return applyIntOp(op(acc, intNode->data()), ls, idx + 1, op);
 }
 
-bool isIntOp(Builtin op) {
+bool Interpreter::isIntOp(Builtin op) {
   switch (op) {
   case Builtin::ADD:
   case Builtin::SUB:
@@ -158,35 +139,37 @@ bool isIntOp(Builtin op) {
   }
 }
 
-void requireIntType(std::shared_ptr<AST> node) {
+void Interpreter::requireIntType(std::shared_ptr<AST> node) {
   if (node->type() != AST::Type::INTEGER) {
     throw SyntaxError("Operator works only on integer types", node);
   }
 }
 
-std::shared_ptr<AST> getSingleListArg(const std::shared_ptr<AST> &opnode,
-                                      const AST::List &ls) {
+std::shared_ptr<AST>
+Interpreter::getSingleListArg(const std::shared_ptr<AST> &opnode,
+                              const AST::List &ls) {
   requireSingleArgument(opnode, ls);
   const auto node = eval(ls[1]);
   requireNonEmptyList(opnode, node);
   return node;
 }
 
-void requireNonEmptyList(const std::shared_ptr<AST> &opnode,
-                         std::shared_ptr<AST> node) {
+void Interpreter::requireNonEmptyList(const std::shared_ptr<AST> &opnode,
+                                      std::shared_ptr<AST> node) {
   requireListType(opnode, node);
   if (0 == node->children().size())
     throw SyntaxError("Operator does not work on empty list", opnode);
 }
 
-void requireSingleArgument(const std::shared_ptr<AST> &opnode, AST::List ls) {
+void Interpreter::requireSingleArgument(const std::shared_ptr<AST> &opnode,
+                                        AST::List ls) {
   if (2 != ls.size()) {
     throw SyntaxError("Builtin requires exactly one argument", opnode);
   }
 }
 
-void requireListType(const std::shared_ptr<AST> &opnode,
-                     std::shared_ptr<AST> node) {
+void Interpreter::requireListType(const std::shared_ptr<AST> &opnode,
+                                  std::shared_ptr<AST> node) {
   if (!node || !node->isBuiltin(Builtin::LIST))
     throw SyntaxError("Argument must be a list", opnode);
 }
