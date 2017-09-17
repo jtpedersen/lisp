@@ -1,4 +1,5 @@
 #include "Interpreter.h"
+#include "Environment.h"
 #include "SyntaxError.h"
 #include "Util.h"
 
@@ -25,13 +26,27 @@ static void requireNonEmptyList(const std::shared_ptr<AST> &opnode,
 static int applyIntOp(const int acc, const AST::List ls, const size_t idx,
                       std::function<int(const int, const int)> op);
 
+static std::shared_ptr<Environment> env = std::make_shared<Environment>();
+
 std::shared_ptr<AST> eval(std::shared_ptr<AST> node) {
   // std::cout << "EVAL: ";
   // util::print(node);
   // std::cout << std::endl;
 
-  if (node->children().size() == 0)
+  if (node->children().size() == 0) {
+    if (node->type() == AST::Type::SYMBOL) {
+      const auto &symbol = std::static_pointer_cast<ASTSymbol>(node);
+      const auto name = symbol->data();
+      const auto ret = (*env)[name];
+      if (!ret) {
+        std::cout << "name:" << name << std::endl;
+        throw SyntaxError("Identifier is not known:", node);
+      }
+      return eval(ret);
+    }
     return node;
+  }
+
   const auto op = eval(node->head());
   if (op->type() == AST::Type::BUILTIN) {
     return evalBuiltin(node->children());
@@ -71,15 +86,23 @@ std::shared_ptr<AST> evalBuiltin(AST::List ls) {
     ret->setChildren(children);
     return ret;
   } else if (op == Builtin::EVAL) {
-    requireSingleArgument(opnode, ls);
-    const auto node = eval(ls[1]);
-    return eval(node);
+    return eval(getSingleListArg(opnode, ls));
   } else if (op == Builtin::PPRINT) {
     requireSingleArgument(opnode, ls);
     const auto node = ls[1];
     util::print(node);
     std::cout << std::endl;
     return eval(node);
+  } else if (op == Builtin::DEFINE) {
+    const auto argList = ls[1];
+    const auto name = argList->head();
+    if (AST::Type::SYMBOL != name->type()) {
+      throw SyntaxError("First entry in arglist must be an identifier",
+                        argList);
+    }
+    const auto body = ls[2];
+    env->setEntry(std::static_pointer_cast<ASTSymbol>(name)->data(), body);
+    return std::make_shared<ASTSexpr>();
   }
   throw SyntaxError("Unimplemented builtin", opnode);
   return nullptr;

@@ -91,38 +91,6 @@ TEST(parser, unbalanced) {
   ASSERT_THROW(p.read(), SyntaxError);
 }
 
-TEST(parser, defineSexpr) {
-  Lexer l("(define () () )");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_EQ(AST::Type::SEXPR, ast->type());
-  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE));
-}
-
-TEST(parser, defineMustHaveArgumentList) {
-  Lexer l("(define )");
-  Parser p(l);
-  try {
-    p.read();
-    FAIL();
-  } catch (SyntaxError &e) {
-    const auto msg = "Define must have argumentlist and body";
-    EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
-  }
-}
-
-TEST(parser, defineMustHaveBody) {
-  Lexer l("(define () )");
-  Parser p(l);
-  try {
-    p.read();
-    FAIL();
-  } catch (SyntaxError &e) {
-    const auto msg = "Define must have a body";
-    EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
-  }
-}
-
 TEST(parser, builtinAdd) {
   Lexer l("(+ 1 2)");
   Parser p(l);
@@ -318,6 +286,48 @@ TEST(parser, pprintBuiltin) {
   ASSERT_TRUE(ast->head()->isBuiltin(Builtin::PPRINT));
   ASSERT_EQ(2, ast->children().size());
 }
+
+TEST(parser, defineBuiltin) {
+  Lexer l("(define (x) 2)");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE));
+  ASSERT_EQ(3, ast->children().size());
+}
+
+TEST(parser, defineSexpr) {
+  Lexer l("(define () () )");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE));
+}
+
+TEST(parser, defineMustHaveArgumentList) {
+  Lexer l("(define )");
+  Parser p(l);
+  try {
+    p.read();
+    FAIL();
+  } catch (SyntaxError &e) {
+    const auto msg = "Define must have argumentlist and body";
+    EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
+  }
+}
+
+TEST(parser, defineMustHaveBody) {
+  Lexer l("(define () )");
+  Parser p(l);
+  try {
+    p.read();
+    FAIL();
+  } catch (SyntaxError &e) {
+    const auto msg = "Define must have a body";
+    EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
+  }
+}
+
 
 
 

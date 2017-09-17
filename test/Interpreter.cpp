@@ -282,6 +282,14 @@ TEST_F(InterpreterTest, joinRequiresAtLeastTwo) {
   }
 }
 
+TEST_F(InterpreterTest, joinManyLists) {
+  load("(join (list a) (list b) (list c) (list d))");
+  const auto res = eval(program);
+  ASSERT_NE(nullptr, res);
+  EXPECT_TRUE(res->isBuiltin(Builtin::LIST)) << res->toString();
+  EXPECT_EQ(4, res->children().size()) << res->toString();
+}
+
 TEST_F(InterpreterTest, evalBuiltin) {
   load("(eval (list + 1 2))");
   const auto res = eval(program);
@@ -301,6 +309,15 @@ TEST_F(InterpreterTest, evalMultiArgs) {
   }
 }
 
+TEST_F(InterpreterTest, evalNotOnAtom) {
+  load("(eval \"hest\")");
+  try {
+    eval(program);
+    FAIL();
+  } catch (SyntaxError &e) {
+  }
+}
+
 TEST_F(InterpreterTest, pprintAtom) {
   load("(pprint 123)");
   const auto res = eval(program);
@@ -311,6 +328,31 @@ TEST_F(InterpreterTest, pprintAtom) {
   EXPECT_EQ(123, i->data());
 }
 
+TEST_F(InterpreterTest, defineBuiltin) {
+  load("(define (x) 2)");
+  const auto res = eval(program);
+  ASSERT_NE(nullptr, res);
+  ASSERT_EQ(res->type(), AST::Type::SEXPR) << res->toString();
+  EXPECT_EQ(0, res->children().size()) << res->toString();
+}
+
+TEST_F(InterpreterTest, defineAffectsEnv) {
+  {
+    load("(define (x) 2)");
+    const auto res = eval(program);
+    ASSERT_NE(nullptr, res);
+    ASSERT_EQ(res->type(), AST::Type::SEXPR) << res->toString();
+    EXPECT_EQ(0, res->children().size()) << res->toString();
+  }
+  {
+    load("(+ x x)");
+    const auto res = eval(program);
+    // ASSERT_NE(nullptr, res);
+    // EXPECT_EQ(0, res->children().size()) << res->toString();
+    // const auto i = std::static_pointer_cast<ASTInt>(res);
+    // EXPECT_EQ(4, i->data());
+  }
+}
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
