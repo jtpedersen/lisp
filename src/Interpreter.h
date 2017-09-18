@@ -10,12 +10,22 @@ public:
   std::shared_ptr<AST> eval(std::shared_ptr<AST> node);
 
 private:
-  std::shared_ptr<AST> evalIntOp(Builtin intOp, AST::List ls);
-
   std::shared_ptr<AST> evalBuiltin(std::shared_ptr<AST> node);
 
+  /// The head of the child list has been evaled to determine operation
+  /// @{
+  std::shared_ptr<AST> evalIntOp(Builtin intOp, AST::List ls);
+  std::shared_ptr<AST> evalDefine(const std::shared_ptr<AST> &node);
+
+  std::shared_ptr<AST> evalList(const AST::List &ls);
+  std::shared_ptr<AST> evalJoin(const std::shared_ptr<AST> &opnode,
+                                const AST::List &ls);
+  std::shared_ptr<AST> evalPPrint(const std::shared_ptr<AST> &opnode,
+                                  const AST::List &ls);
+
+  /// @}
+
   void requireIntType(std::shared_ptr<AST> node);
-  bool isIntOp(Builtin op);
 
   std::shared_ptr<AST> getSingleListArg(const std::shared_ptr<AST> &opnode,
                                         const AST::List &ls);

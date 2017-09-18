@@ -8,5 +8,5 @@
 (list (head (list "hest")))
 (eval (pprint(join (list +) (list 2 3))))
 (define (x) (+ 1 2 y))
-(define (y) 2)
-(+ x x)
+(define y 2)
+(+ y y)

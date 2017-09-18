@@ -14,9 +14,9 @@ Environment::~Environment() {
 }
 
 void Environment::setEntry(const char *symbol, std::shared_ptr<AST> node) {
-  std::cout << "Set:" << symbol << "-->";
-  util::print(node);
-  std::cout <<std::endl;
+  // std::cout << "Set:" << symbol << "-->";
+  // util::print(node);
+  // std::cout <<std::endl;
   env[strdup(symbol)] = node;
   assert(env.find(symbol) != env.cend());
 }

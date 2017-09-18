@@ -10,7 +10,7 @@
 Interpreter::Interpreter() : env(std::make_shared<Environment>()) {}
 
 static void showNode(const char *prefix, const std::shared_ptr<AST> &node) {
-#if 1
+#if 0
   std::cout << prefix;
   util::print(node);
   std::cout << std::endl;
@@ -61,61 +61,62 @@ std::shared_ptr<AST> Interpreter::evalBuiltin(std::shared_ptr<AST> node) {
   }
   const auto opnode = std::static_pointer_cast<ASTBuiltin>(ls.front());
   const auto op = opnode->op();
-  if (isIntOp(op)) {
+
+  switch (op) {
+  case Builtin::ADD:
+  case Builtin::SUB:
+  case Builtin::DIV:
+  case Builtin::MUL:
+  case Builtin::MOD:
     return evalIntOp(op, ls);
-  }
-  if (op == Builtin::LIST) {
-    auto ret = std::make_shared<ASTBuiltin>(Builtin::LIST);
-    AST::List children(ls.begin() + 1, ls.end());
-    ret->setChildren(children);
-    return ret;
-  } else if (op == Builtin::HEAD) {
+  case Builtin::DEFINE:
+    return evalDefine(node);
+  case Builtin::LIST:
+    return evalList(ls);
+  case Builtin::HEAD:
     return getSingleListArg(opnode, ls)->children().front();
-  } else if (op == Builtin::TAIL) {
+  case Builtin::TAIL:
     return getSingleListArg(opnode, ls)->children().back();
-  } else if (op == Builtin::JOIN) {
-    AST::List children;
-    for (auto it = (ls.begin() + 1); it != ls.end(); ++it) {
-      const auto node = eval(*it);
-      requireListType(opnode, node);
-      const auto xs = node->children();
-      children.insert(children.cend(), xs.cbegin(), xs.cend());
-    }
-    auto ret = std::make_shared<ASTBuiltin>(Builtin::LIST);
-    ret->setChildren(children);
-    return ret;
-  } else if (op == Builtin::EVAL) {
+  case Builtin::JOIN:
+    return evalJoin(opnode, ls);
+  case Builtin::EVAL:
     return eval(getSingleListArg(opnode, ls));
-  } else if (op == Builtin::PPRINT) {
-    requireSingleArgument(opnode, ls);
-    const auto node = ls[1];
-    util::print(node);
-    std::cout << std::endl;
-    return eval(node);
-  } else if (op == Builtin::DEFINE) {
-    const auto argList = ls[1];
-    if (AST::Type::SYMBOL == argList->type()) {
-      // Define a variable
-      const auto name = symbolName(argList);
-      const auto body = ls[2];
-      env->setEntry(name, body);
-    } else {
-      showNode("Define function: ", node);
-      if (argList->children().size() < 1) {
-        throw SyntaxError("Define must have a name", node);
-      }
-      for (const auto &child : argList->children()) {
-        if (AST::Type::SYMBOL != child->type()) {
-          throw SyntaxError("Arglist must only contain identifiers", argList);
-        }
-      }
-      node->setType(AST::Type::FUN);
-      env->setEntry(symbolName(argList->head()), node);
-    }
-    return std::make_shared<ASTSexpr>();
-  }
+  case Builtin::PPRINT:
+    return evalPPrint(opnode, ls);
+  case Builtin::UNKNOWN:
+    break;
+  };
   throw SyntaxError("Unimplemented builtin", opnode);
   return nullptr;
+}
+
+std::shared_ptr<AST> Interpreter::evalList(const AST::List &ls) {
+  auto ret = std::make_shared<ASTBuiltin>(Builtin::LIST);
+  AST::List children(ls.begin() + 1, ls.end());
+  ret->setChildren(children);
+  return ret;
+}
+std::shared_ptr<AST> Interpreter::evalJoin(const std::shared_ptr<AST> &opnode,
+                                           const AST::List &ls) {
+  AST::List children;
+  for (auto it = (ls.begin() + 1); it != ls.end(); ++it) {
+    const auto node = eval(*it);
+    requireListType(opnode, node);
+    const auto xs = node->children();
+    children.insert(children.cend(), xs.cbegin(), xs.cend());
+  }
+  auto ret = std::make_shared<ASTBuiltin>(Builtin::LIST);
+  ret->setChildren(children);
+  return ret;
+}
+
+std::shared_ptr<AST> Interpreter::evalPPrint(const std::shared_ptr<AST> &opnode,
+                                             const AST::List &ls) {
+  requireSingleArgument(opnode, ls);
+  const auto node = ls[1];
+  util::print(node);
+  std::cout << std::endl;
+  return eval(node);
 }
 
 std::shared_ptr<AST> Interpreter::evalIntOp(Builtin intOp, AST::List ls) {
@@ -123,15 +124,6 @@ std::shared_ptr<AST> Interpreter::evalIntOp(Builtin intOp, AST::List ls) {
     throw SyntaxError("Expected operators for operator", ls.front());
 
   const auto first = eval(ls[1]);
-
-  std::cout << "ATINT: ";
-  util::print(ls[1]);
-  std::cout << std::endl;
-
-  std::cout << "ATINT: ";
-  util::print(first);
-  std::cout << std::endl;
-
   requireIntType(first);
   const auto firstVal = std::static_pointer_cast<ASTInt>(first)->data();
 
@@ -165,17 +157,28 @@ int Interpreter::applyIntOp(const int acc, const AST::List ls, const size_t idx,
   return applyIntOp(op(acc, intNode->data()), ls, idx + 1, op);
 }
 
-bool Interpreter::isIntOp(Builtin op) {
-  switch (op) {
-  case Builtin::ADD:
-  case Builtin::SUB:
-  case Builtin::MUL:
-  case Builtin::DIV:
-  case Builtin::MOD:
-    return true;
-  default:
-    return false;
+std::shared_ptr<AST> Interpreter::evalDefine(const std::shared_ptr<AST> &node) {
+  const auto ls = node->children();
+  const auto argList = ls[1];
+  if (AST::Type::SYMBOL == argList->type()) {
+    // Define a variable
+    const auto name = symbolName(argList);
+    const auto body = ls[2];
+    env->setEntry(name, body);
+  } else {
+    showNode("Define function: ", node);
+    if (argList->children().size() < 1) {
+      throw SyntaxError("Define must have a name", node);
+    }
+    for (const auto &child : argList->children()) {
+      if (AST::Type::SYMBOL != child->type()) {
+        throw SyntaxError("Arglist must only contain identifiers", argList);
+      }
+    }
+    node->setType(AST::Type::FUN);
+    env->setEntry(symbolName(argList->head()), node);
   }
+  return std::make_shared<ASTSexpr>();
 }
 
 void Interpreter::requireIntType(std::shared_ptr<AST> node) {
