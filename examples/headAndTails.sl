@@ -10,3 +10,6 @@
 (define (x) (+ 1 2 y))
 (define y 2)
 (+ y y)
+(define (square x) (* x x))
+(define (f n acc) (if n (pprint (f (- n 1) (square acc))) acc))
+(f 4 2)

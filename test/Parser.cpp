@@ -63,6 +63,22 @@ TEST(parser, symbolAndInteger) {
   EXPECT_EQ(AST::Type::INTEGER, (*ast)[1]->type()) << (*ast)[1]->type();
 }
 
+// TEST(parser, booleanTrue) {
+//   Lexer l("#t");
+//   Parser p(l);
+//   const auto ast = p.read();
+//   ASSERT_NE(ast, nullptr);
+//   EXPECT_EQ(AST::Type::BOOLEAN, ast->type());
+// }
+
+// TEST(parser, booleanFalse) {
+//   Lexer l("#f");
+//   Parser p(l);
+//   const auto ast = p.read();
+//   ASSERT_NE(ast, nullptr);
+//   EXPECT_EQ(AST::Type::BOOLEAN, ast->type());
+// }
+
 TEST(parser, nestedSexpr) {
   Lexer l("( () () )");
   Parser p(l);

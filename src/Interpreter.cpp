@@ -84,7 +84,7 @@ std::shared_ptr<AST> Interpreter::evalBuiltin(std::shared_ptr<AST> node) {
   case Builtin::PPRINT:
     return evalPPrint(opnode, ls);
   case Builtin::IF:
-    evalIf(ls);
+    return evalIf(ls);
   case Builtin::UNKNOWN:
     break;
   };
@@ -114,7 +114,12 @@ std::shared_ptr<AST> Interpreter::evalJoin(const std::shared_ptr<AST> &opnode,
 }
 
 std::shared_ptr<AST> Interpreter::evalIf(const AST::List &ls) {
-  return nullptr;
+  const auto res = eval(ls[1]);
+  if (0 != std::static_pointer_cast<ASTInt>(res)->data()) {
+    return eval(ls[2]);
+  } else {
+    return eval(ls[3]);
+  }
 }
 
 std::shared_ptr<AST> Interpreter::evalPPrint(const std::shared_ptr<AST> &opnode,

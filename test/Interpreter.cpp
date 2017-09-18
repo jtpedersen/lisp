@@ -365,6 +365,23 @@ TEST_F(InterpreterTest, defunBindsArgs) {
   res = eval();
 }
 
+TEST_F(InterpreterTest, ifPrimitive) {
+  load("(if 0 \"true\" \"false\")");
+  const auto res = eval();
+  ASSERT_NE(nullptr, res);
+  const auto str = std::static_pointer_cast<ASTString>(res);
+  EXPECT_STREQ(str->data(), "false");
+}
+
+TEST_F(InterpreterTest, ifPrimitiveTrue) {
+  load("(if \"somethingThatIsNotIntegerZeroe\" \"true\" \"false\")");
+  const auto res = eval();
+  ASSERT_NE(nullptr, res);
+  const auto str = std::static_pointer_cast<ASTString>(res);
+  EXPECT_STREQ(str->data(), "true");
+}
+
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
