@@ -34,7 +34,8 @@ private:
   const char *pos;
   char current;
   bool good;
-  int line_, col_;
+  int line_;
+  int col_;
 
   TokenType readString();
   TokenType readAtom();

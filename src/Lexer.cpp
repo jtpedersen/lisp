@@ -7,7 +7,7 @@
 #include <string.h>
 
 Lexer::Lexer(const char *const data)
-    : data(data), pos(data), good(true), current('\0'), line_(0), col_(0) {}
+    : data(data), pos(data), current('\0'), good(true), line_(0), col_(0) {}
 
 Lexer::TokenType Lexer::nextToken() {
   nextChar();

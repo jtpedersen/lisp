@@ -5,14 +5,6 @@
 
 #include <memory>
 
-// "                                          \
-  //   number : /-?[0-9]+/ ;                    \
-  //   symbol : 'identifer'
-//   sexpr  : '(' <expr>* ')' ;               \
-  //   expr   : <number> | <symbol> | <sexpr> ; \
-  //   lispy  : /^/ <expr>* /$/ ;               \
-  // ",
-
 class Parser {
 public:
   explicit Parser(const Lexer &lexer);

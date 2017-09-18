@@ -67,6 +67,8 @@ void Parser::checkSyntaxForBuiltin(AST::List ls) const {
   case Builtin::MOD:
   case Builtin::HEAD:
   case Builtin::TAIL:
+  case Builtin::EVAL:
+  case Builtin::PPRINT:
     if (1 == ls.size()) {
       throw SyntaxError("Builtin requires operands", first);
     }

@@ -3,7 +3,8 @@
 SyntaxError::SyntaxError(const char *what, int line, int col)
     : msg(what), line(line), col(col) {}
 
-SyntaxError::SyntaxError(const char *what, std::shared_ptr<AST> node) : col(0), line(0){
+SyntaxError::SyntaxError(const char *what, std::shared_ptr<AST> node)
+    : line(0), col(0) {
   char *buf = static_cast<char *>(malloc(strlen(what) + 1024));
   sprintf(buf, "%s @ \"%s\"", what, node->toString());
   msg = buf;
