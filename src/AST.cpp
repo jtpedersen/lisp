@@ -26,6 +26,8 @@ const char *builtinToCString(Builtin op) {
     return "eval";
   case Builtin::PPRINT:
     return "pprint";
+  case Builtin::IF:
+    return "if";
   case Builtin::UNKNOWN:
     return "UNKNOWN";
   }
@@ -58,6 +60,8 @@ Builtin builtinFromCString(const char *str) {
     return Builtin::EVAL;
   } else if (0 == strcmp("pprint", str)) {
     return Builtin::PPRINT;
+  } else if (0 == strcmp("if", str)) {
+    return Builtin::IF;
   }
   return Builtin::UNKNOWN;
 }

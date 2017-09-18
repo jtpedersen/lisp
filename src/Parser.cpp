@@ -86,7 +86,11 @@ void Parser::checkSyntaxForBuiltin(AST::List ls) const {
       throw SyntaxError("Builtin requires two operands", first);
     }
     break;
-
+  case Builtin::IF:
+    if (ls.size() < 4) {
+      throw SyntaxError("If-expression must har predicate and such", first);
+    }
+    break;
   case Builtin::LIST:
     break;
   case Builtin::UNKNOWN:

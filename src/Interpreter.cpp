@@ -83,6 +83,8 @@ std::shared_ptr<AST> Interpreter::evalBuiltin(std::shared_ptr<AST> node) {
     return eval(getSingleListArg(opnode, ls));
   case Builtin::PPRINT:
     return evalPPrint(opnode, ls);
+  case Builtin::IF:
+    evalIf(ls);
   case Builtin::UNKNOWN:
     break;
   };
@@ -96,6 +98,7 @@ std::shared_ptr<AST> Interpreter::evalList(const AST::List &ls) {
   ret->setChildren(children);
   return ret;
 }
+
 std::shared_ptr<AST> Interpreter::evalJoin(const std::shared_ptr<AST> &opnode,
                                            const AST::List &ls) {
   AST::List children;
@@ -108,6 +111,10 @@ std::shared_ptr<AST> Interpreter::evalJoin(const std::shared_ptr<AST> &opnode,
   auto ret = std::make_shared<ASTBuiltin>(Builtin::LIST);
   ret->setChildren(children);
   return ret;
+}
+
+std::shared_ptr<AST> Interpreter::evalIf(const AST::List &ls) {
+  return nullptr;
 }
 
 std::shared_ptr<AST> Interpreter::evalPPrint(const std::shared_ptr<AST> &opnode,

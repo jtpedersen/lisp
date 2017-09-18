@@ -335,7 +335,8 @@ TEST(parser, defineFunSexpr) {
   Parser p(l);
   const auto ast = p.read();
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
-  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE)) << ast->head()->toString();
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE))
+      << ast->head()->toString();
 }
 
 TEST(parser, defineFunSexprWithArgs) {
@@ -343,7 +344,29 @@ TEST(parser, defineFunSexprWithArgs) {
   Parser p(l);
   const auto ast = p.read();
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
-  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE)) << ast->head()->toString();
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE))
+      << ast->head()->toString();
+}
+
+TEST(parser, defineIf) {
+  Lexer l("(if (predicate) (yes) (no) )");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::IF))
+      << ast->head()->toString();
+}
+
+TEST(parser, ifMustHaveCondBranches) {
+  Lexer l("(if )");
+  Parser p(l);
+  try {
+    p.read();
+    FAIL();
+  } catch (SyntaxError &e) {
+    const auto msg = "If-expression must har predicate and such";
+    EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
+  }
 }
 
 int main(int argc, char **argv) {

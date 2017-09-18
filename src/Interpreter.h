@@ -22,6 +22,7 @@ private:
                                 const AST::List &ls);
   std::shared_ptr<AST> evalPPrint(const std::shared_ptr<AST> &opnode,
                                   const AST::List &ls);
+  std::shared_ptr<AST> evalIf(const AST::List &ls);
 
   /// @}
 
