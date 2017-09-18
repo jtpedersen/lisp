@@ -332,7 +332,7 @@ TEST_F(InterpreterTest, pprintAtom) {
 }
 
 TEST_F(InterpreterTest, defineBuiltin) {
-  load("(define (x) 2)");
+  load("(define x 2)");
   const auto res = eval();
   ASSERT_NE(nullptr, res);
   ASSERT_EQ(res->type(), AST::Type::SEXPR) << res->toString();
@@ -341,14 +341,14 @@ TEST_F(InterpreterTest, defineBuiltin) {
 
 TEST_F(InterpreterTest, defineAffectsEnv) {
   {
-    load("(define (x) 2)");
+    load("(define x 2)");
     const auto res = eval();
     ASSERT_NE(nullptr, res);
     ASSERT_EQ(res->type(), AST::Type::SEXPR) << res->toString();
     EXPECT_EQ(0, res->children().size()) << res->toString();
   }
   {
-    load("(+ (x) (x))");
+    load("(+ x x)");
     const auto res = eval();
     ASSERT_NE(nullptr, res);
     EXPECT_EQ(0, res->children().size()) << res->toString();
@@ -357,7 +357,7 @@ TEST_F(InterpreterTest, defineAffectsEnv) {
   }
 }
 
-TEST_F(InterpreterTest, defineBindsArgs) {
+TEST_F(InterpreterTest, defunBindsArgs) {
   load("(define (f y) (+ y 1))");
   auto res = eval();
   ASSERT_NE(nullptr, res);

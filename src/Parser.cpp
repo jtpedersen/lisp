@@ -73,12 +73,11 @@ void Parser::checkSyntaxForBuiltin(AST::List ls) const {
       throw SyntaxError("Builtin requires operands", first);
     }
     break;
-
   case Builtin::DEFINE: {
     if (1 == ls.size()) {
-      throw SyntaxError("Define must have argumentlist and body", first);
+      throw SyntaxError("Definition must have argumentlist and body", first);
     } else if (2 == ls.size()) {
-      throw SyntaxError("Define must have a body", first);
+      throw SyntaxError("Definition must have a body", first);
     }
     break;
   }

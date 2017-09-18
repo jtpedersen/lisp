@@ -2,8 +2,8 @@
 #include "gtest/gtest.h"
 
 #include "Parser.h"
-#include "Util.h"
 #include "SyntaxError.h"
+#include "Util.h"
 
 TEST(parser, minimal) {
   Lexer l("()");
@@ -31,7 +31,6 @@ TEST(parser, String) {
   ASSERT_EQ(AST::Type::STRING, ast->type());
   ASSERT_EQ(ast->children().size(), 0);
 }
-
 
 TEST(parser, singleSymbolChild) {
   Lexer l("(hest)");
@@ -100,8 +99,7 @@ TEST(parser, builtinAdd) {
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
   const auto node = std::static_pointer_cast<ASTBuiltin>(first);
-  EXPECT_EQ(Builtin::ADD, node->op())
-      << builtinToCString(node->op());
+  EXPECT_EQ(Builtin::ADD, node->op()) << builtinToCString(node->op());
 }
 
 TEST(parser, builtinSub) {
@@ -113,8 +111,7 @@ TEST(parser, builtinSub) {
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
   const auto node = std::static_pointer_cast<ASTBuiltin>(first);
-  EXPECT_EQ(Builtin::SUB, node->op())
-      << builtinToCString(node->op());
+  EXPECT_EQ(Builtin::SUB, node->op()) << builtinToCString(node->op());
 }
 
 TEST(parser, builtinDiv) {
@@ -126,8 +123,7 @@ TEST(parser, builtinDiv) {
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
   const auto node = std::static_pointer_cast<ASTBuiltin>(first);
-  EXPECT_EQ(Builtin::DIV, node->op())
-      << builtinToCString(node->op());
+  EXPECT_EQ(Builtin::DIV, node->op()) << builtinToCString(node->op());
 }
 
 TEST(parser, builtinMul) {
@@ -139,10 +135,8 @@ TEST(parser, builtinMul) {
   const auto first = ast->children()[0];
   EXPECT_EQ(first->type(), AST::Type::BUILTIN);
   const auto node = std::static_pointer_cast<ASTBuiltin>(first);
-  EXPECT_EQ(Builtin::MUL, node->op())
-      << builtinToCString(node->op());
+  EXPECT_EQ(Builtin::MUL, node->op()) << builtinToCString(node->op());
 }
-
 
 TEST(parser, builtinArgs) {
   Lexer l("(* 1 2 3)");
@@ -151,7 +145,6 @@ TEST(parser, builtinArgs) {
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_EQ(4, ast->children().size());
 }
-
 
 TEST(parser, toStringInteger) {
   Lexer l("12");
@@ -183,7 +176,6 @@ TEST(parser, listBuiltin) {
   ASSERT_EQ(4, ast->children().size());
 }
 
-
 TEST(parser, headBuiltin) {
   Lexer l("(head (list a))");
   Parser p(l);
@@ -206,7 +198,6 @@ TEST(parser, headNeepsOperands) {
     FAIL() << e.what() << " was not expected here";
   }
 }
-
 
 TEST(parser, tailBuiltin) {
   Lexer l("(tail (list a))");
@@ -268,7 +259,6 @@ TEST(parser, joinNeedsMoreThanOneOperand) {
   }
 }
 
-
 TEST(parser, evalBuiltin) {
   Lexer l("(eval (list + 1 2))");
   Parser p(l);
@@ -288,7 +278,7 @@ TEST(parser, pprintBuiltin) {
 }
 
 TEST(parser, defineBuiltin) {
-  Lexer l("(define (x) 2)");
+  Lexer l("(define x 2)");
   Parser p(l);
   const auto ast = p.read();
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
@@ -297,39 +287,64 @@ TEST(parser, defineBuiltin) {
 }
 
 TEST(parser, defineSexpr) {
-  Lexer l("(define () () )");
+  Lexer l("(define y () )");
   Parser p(l);
   const auto ast = p.read();
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE));
 }
 
-TEST(parser, defineMustHaveArgumentList) {
+TEST(parser, defineMustHaveName) {
   Lexer l("(define )");
   Parser p(l);
   try {
     p.read();
     FAIL();
   } catch (SyntaxError &e) {
-    const auto msg = "Define must have argumentlist and body";
+    const auto msg = "Definition must have argumentlist and body";
     EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
   }
 }
 
 TEST(parser, defineMustHaveBody) {
-  Lexer l("(define () )");
+  Lexer l("(define (name) )");
   Parser p(l);
   try {
     p.read();
     FAIL();
   } catch (SyntaxError &e) {
-    const auto msg = "Define must have a body";
+    const auto msg = "Definition must have a body";
     EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
   }
 }
 
+TEST(parser, defineVarMustHaveBody) {
+  Lexer l("(define x )");
+  Parser p(l);
+  try {
+    p.read();
+    FAIL();
+  } catch (SyntaxError &e) {
+    const auto msg = "Definition must have a body";
+    EXPECT_EQ(0, strncmp(msg, e.what(), strlen(msg)));
+  }
+}
 
+TEST(parser, defineFunSexpr) {
+  Lexer l("(define (name) (+ 1 2) )");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE)) << ast->head()->toString();
+}
 
+TEST(parser, defineFunSexprWithArgs) {
+  Lexer l("(define (name x y) (* x y) )");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_EQ(AST::Type::SEXPR, ast->type());
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE)) << ast->head()->toString();
+}
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

@@ -9,11 +9,16 @@
 
 Interpreter::Interpreter() : env(std::make_shared<Environment>()) {}
 
-std::shared_ptr<AST> Interpreter::eval(std::shared_ptr<AST> node) {
-  std::cout << "EVAL: ";
+static void showNode(const char *prefix, const std::shared_ptr<AST> &node) {
+#if 1
+  std::cout << prefix;
   util::print(node);
   std::cout << std::endl;
+#endif
+}
 
+std::shared_ptr<AST> Interpreter::eval(std::shared_ptr<AST> node) {
+  showNode("EVAL: ", node);
   if (node->children().size() == 0) {
     if (node->type() == AST::Type::SYMBOL) {
       const auto &symbol = std::static_pointer_cast<ASTSymbol>(node);
@@ -34,13 +39,9 @@ std::shared_ptr<AST> Interpreter::eval(std::shared_ptr<AST> node) {
   } else if (op->type() == AST::Type::FUN) {
     assert(op->children().size() == 3);
     const auto arglist = op->children()[1];
-    std::cout << "arglist: ";
-    util::print(arglist);
-    std::cout << std::endl;
+    showNode("ArgList: ", arglist);
 
-    std::cout << "call: ";
-    util::print(node);
-    std::cout << std::endl;
+    showNode("Call: ", node);
 
     for (unsigned int i = 1; i < arglist->children().size(); i++) {
       env->setEntry(symbolName(arglist->children()[i]),
@@ -93,12 +94,24 @@ std::shared_ptr<AST> Interpreter::evalBuiltin(std::shared_ptr<AST> node) {
     return eval(node);
   } else if (op == Builtin::DEFINE) {
     const auto argList = ls[1];
-    const auto name = argList->head();
-    if (AST::Type::SYMBOL != name->type()) {
-      throw SyntaxError("Arglist must only contain identifiers", argList);
+    if (AST::Type::SYMBOL == argList->type()) {
+      // Define a variable
+      const auto name = symbolName(argList);
+      const auto body = ls[2];
+      env->setEntry(name, body);
+    } else {
+      showNode("Define function: ", node);
+      if (argList->children().size() < 1) {
+        throw SyntaxError("Define must have a name", node);
+      }
+      for (const auto &child : argList->children()) {
+        if (AST::Type::SYMBOL != child->type()) {
+          throw SyntaxError("Arglist must only contain identifiers", argList);
+        }
+      }
+      node->setType(AST::Type::FUN);
+      env->setEntry(symbolName(argList->head()), node);
     }
-    node->setType(AST::Type::FUN);
-    env->setEntry(std::static_pointer_cast<ASTSymbol>(name)->data(), node);
     return std::make_shared<ASTSexpr>();
   }
   throw SyntaxError("Unimplemented builtin", opnode);
