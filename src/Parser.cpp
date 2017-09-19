@@ -57,6 +57,9 @@ std::shared_ptr<AST> Parser::readExpr() {
   } else if (TokenType::END_PAREN == tokenType) {
     return nullptr;
   }
+  // } else if (TokenType::TOKEN_EOF == tokenType) {
+  //   return nullptr;
+  // }
   syntaxError("Expected expression");
   return nullptr; // to please the compiler
 }

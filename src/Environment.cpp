@@ -5,7 +5,7 @@
 #include <iostream>
 
 Environment::Environment(std::shared_ptr<Environment> parent)
-    : parent(parent) {}
+    : parent_(parent) {}
 
 Environment::~Environment() {
   for (const auto e : env) {
@@ -25,7 +25,16 @@ std::shared_ptr<AST> Environment::operator[](const char *symbol) {
   auto it = env.find(symbol);
   if (it != env.end())
     return (*it).second;
-  if (parent)
-    return (*parent)[symbol];
+  if (parent_)
+    return (*parent_)[symbol];
   return nullptr;
+}
+
+std::shared_ptr<Environment> Environment::parent() const { return parent_; }
+
+
+void Environment::dump() const {
+  for (const auto e : env) {
+    std::cout << e.first << ": " << e.second->toString() << std::endl;
+  }
 }

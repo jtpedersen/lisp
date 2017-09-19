@@ -14,6 +14,10 @@ public:
   void setEntry(const char *symbol, std::shared_ptr<AST> node);
   std::shared_ptr<AST> operator[](const char *symbol);
 
+  std::shared_ptr<Environment> parent() const;
+
+  void dump() const;
+
 private:
   struct cmp_str {
     bool operator()(char const *a, char const *b) {
@@ -21,7 +25,7 @@ private:
     }
   };
   std::map<const char *, std::shared_ptr<AST>, cmp_str> env;
-  std::shared_ptr<Environment> parent;
+  std::shared_ptr<Environment> parent_;
 };
 
 #endif /* !ENVIRONMENT_H_ */
