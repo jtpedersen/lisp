@@ -132,6 +132,10 @@ std::shared_ptr<AST> Interpreter::evalIf(const AST::List &ls) {
     if (AST::Type::BOOLEAN == res->type()) {
       return std::static_pointer_cast<ASTBoolean>(res)->data();
     }
+    if (res->isBuiltin(Builtin::LIST)) {
+      return res->children().size() > 0;
+    }
+
     return 0 != std::static_pointer_cast<ASTInt>(res)->data();
   }
   ();
