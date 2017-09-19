@@ -381,6 +381,87 @@ TEST_F(InterpreterTest, ifPrimitiveTrue) {
   EXPECT_STREQ(str->data(), "true");
 }
 
+TEST_F(InterpreterTest, eqFalseString) {
+  load("(= \"true\" \"false\")");
+  const auto res = eval();
+  ASSERT_NE(nullptr, res);
+  ASSERT_EQ(res->type(), AST::Type::BOOLEAN);
+  const auto str = std::static_pointer_cast<ASTBoolean>(res);
+  EXPECT_FALSE(str->data());
+}
+
+TEST_F(InterpreterTest, eqTrueString) {
+  load("(= \"true\" \"true\")");
+  const auto res = eval();
+  ASSERT_NE(nullptr, res);
+  ASSERT_EQ(res->type(), AST::Type::BOOLEAN);
+  const auto str = std::static_pointer_cast<ASTBoolean>(res);
+  EXPECT_TRUE(str->data());
+}
+
+TEST_F(InterpreterTest, eqFalseInteger) {
+  load("(= 0 0 0 1)");
+  const auto res = eval();
+  ASSERT_NE(nullptr, res);
+  ASSERT_EQ(res->type(), AST::Type::BOOLEAN);
+  const auto str = std::static_pointer_cast<ASTBoolean>(res);
+  EXPECT_FALSE(str->data());
+}
+
+TEST_F(InterpreterTest, eqTrueInteger) {
+  load("(= 2 2 2 2 2 2)");
+  const auto res = eval();
+  ASSERT_NE(nullptr, res);
+  ASSERT_EQ(res->type(), AST::Type::BOOLEAN);
+  const auto str = std::static_pointer_cast<ASTBoolean>(res);
+  EXPECT_TRUE(str->data());
+}
+
+TEST_F(InterpreterTest, ltFalseInteger) {
+  load("(< 4 3 2 1)");
+  const auto res = eval();
+  ASSERT_NE(nullptr, res);
+  ASSERT_EQ(res->type(), AST::Type::BOOLEAN);
+  const auto str = std::static_pointer_cast<ASTBoolean>(res);
+  EXPECT_FALSE(str->data());
+}
+
+TEST_F(InterpreterTest, ltTrueInteger) {
+  load("(< 1 2 3 4)");
+  const auto res = eval();
+  ASSERT_NE(nullptr, res);
+  ASSERT_EQ(res->type(), AST::Type::BOOLEAN);
+  const auto str = std::static_pointer_cast<ASTBoolean>(res);
+  EXPECT_TRUE(str->data());
+}
+
+TEST_F(InterpreterTest, ltSameTypeArgs) {
+  load("(< 1 2 3 4 hest)");
+  try {
+    const auto res = eval();
+    FAIL() << res->toString();
+  } catch (SyntaxError &e) {
+  }
+}
+
+TEST_F(InterpreterTest, gtFalseInteger) {
+  load("(> 1 2 3 4)");
+  const auto res = eval();
+  ASSERT_NE(nullptr, res);
+  ASSERT_EQ(res->type(), AST::Type::BOOLEAN);
+  const auto str = std::static_pointer_cast<ASTBoolean>(res);
+  EXPECT_FALSE(str->data());
+}
+
+TEST_F(InterpreterTest, gtTrueInteger) {
+  load("(> 4 3 2 1)");
+  const auto res = eval();
+  ASSERT_NE(nullptr, res);
+  ASSERT_EQ(res->type(), AST::Type::BOOLEAN);
+  const auto str = std::static_pointer_cast<ASTBoolean>(res);
+  EXPECT_TRUE(str->data());
+}
+
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

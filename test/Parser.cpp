@@ -385,6 +385,54 @@ TEST(parser, ifMustHaveCondBranches) {
   }
 }
 
+TEST(parser, operatorEq) {
+  Lexer l("=");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_NE(ast, nullptr);
+  ASSERT_TRUE(ast->isBuiltin(Builtin::EQ));
+}
+
+TEST(parser, operatorGT) {
+  Lexer l(">");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_NE(ast, nullptr);
+  ASSERT_TRUE(ast->isBuiltin(Builtin::GT));
+}
+
+
+TEST(parser, operatorGE) {
+  Lexer l(">=");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_NE(ast, nullptr);
+  ASSERT_TRUE(ast->isBuiltin(Builtin::GE));
+}
+
+
+TEST(parser, operatorLT) {
+  Lexer l("<");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_NE(ast, nullptr);
+  ASSERT_TRUE(ast->isBuiltin(Builtin::LT));
+}
+
+
+TEST(parser, operatorLE) {
+  Lexer l("<=");
+  Parser p(l);
+  const auto ast = p.read();
+  ASSERT_NE(ast, nullptr);
+  ASSERT_TRUE(ast->isBuiltin(Builtin::LE));
+}
+
+
+
+
+
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

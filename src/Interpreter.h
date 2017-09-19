@@ -1,6 +1,7 @@
 #ifndef INTERPRETER_H_
 #define INTERPRETER_H_
 #include "AST.h"
+#include <functional>
 
 class Environment;
 
@@ -24,7 +25,15 @@ private:
                                   const AST::List &ls);
   std::shared_ptr<AST> evalIf(const AST::List &ls);
 
+  std::shared_ptr<AST> evalEq(AST::List ls);
+
+  std::shared_ptr<AST>
+  evalIntCmp(const AST::List &ls,
+             std::function<bool(const int &, const int &)>);
+
   /// @}
+
+  AST::List getEvaledArgs(const AST::List xs);
 
   void requireIntType(std::shared_ptr<AST> node);
 

@@ -18,6 +18,11 @@ enum class Builtin {
   EVAL,
   PPRINT,
   IF,
+  EQ,
+  GT,
+  GE,
+  LT,
+  LE,
   UNKNOWN,
   // TODO && || etc
 };
@@ -107,7 +112,7 @@ public:
   explicit ASTBoolean(bool data) : ASTDataNode(data){};
   const char *toString() override {
     char buf[1024];
-    snprintf(buf, 1024, "%s", data() ? "true": "false");
+    snprintf(buf, 1024, "%s", data() ? "true" : "false");
     return strdup(buf);
   }
 };

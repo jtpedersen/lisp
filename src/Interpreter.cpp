@@ -3,8 +3,8 @@
 #include "SyntaxError.h"
 #include "Util.h"
 
+#include <algorithm>
 #include <cassert>
-#include <functional>
 #include <iostream>
 
 Interpreter::Interpreter() : env(std::make_shared<Environment>()) {}
@@ -40,7 +40,6 @@ std::shared_ptr<AST> Interpreter::eval(std::shared_ptr<AST> node) {
     assert(op->children().size() == 3);
     const auto arglist = op->children()[1];
     showNode("ArgList: ", arglist);
-
     showNode("Call: ", node);
 
     for (unsigned int i = 1; i < arglist->children().size(); i++) {
@@ -86,6 +85,17 @@ std::shared_ptr<AST> Interpreter::evalBuiltin(std::shared_ptr<AST> node) {
   case Builtin::IF:
     return evalIf(ls);
   case Builtin::UNKNOWN:
+    break;
+  case Builtin::EQ:
+    return evalEq(ls);
+  case Builtin::GT:
+    return evalIntCmp(ls, [](const auto &a, const auto &b) { return a > b; });
+  case Builtin::GE:
+    return evalIntCmp(ls, [](const auto &a, const auto &b) { return a >= b; });
+  case Builtin::LT:
+    return evalIntCmp(ls, [](const auto &a, const auto &b) { return a < b; });
+  case Builtin::LE:
+    return evalIntCmp(ls, [](const auto &a, const auto &b) { return a <= b; });
     break;
   };
   throw SyntaxError("Unimplemented builtin", opnode);
@@ -175,6 +185,63 @@ int Interpreter::applyIntOp(const int acc, const AST::List ls, const size_t idx,
   requireIntType(n);
   const auto intNode = std::static_pointer_cast<ASTInt>(n);
   return applyIntOp(op(acc, intNode->data()), ls, idx + 1, op);
+}
+
+template <typename PtrType, class BinOp>
+bool applyOp(const AST::List &ls, BinOp op) {
+  for (unsigned int i = 1; i < ls.size(); i++) {
+    const auto &a = std::static_pointer_cast<PtrType>(ls[i - 1])->data();
+    const auto &b = std::static_pointer_cast<PtrType>(ls[i])->data();
+    if (!op(a, b))
+      return false;
+  }
+  return true;
+}
+
+std::shared_ptr<AST> Interpreter::evalEq(AST::List xs) {
+  const auto ys = getEvaledArgs(xs);
+  switch (ys.front()->type()) {
+  case AST::Type::STRING: {
+    const auto res = applyOp<ASTString>(
+        ys, [](const auto &a, const auto &b) { return 0 == strcmp(a, b); });
+    return std::make_shared<ASTBoolean>(res);
+  }
+  case AST::Type::INTEGER: {
+    const auto res = applyOp<ASTInt>(
+        ys, [](const auto &a, const auto &b) { return a == b; });
+    return std::make_shared<ASTBoolean>(res);
+  }
+  default:
+    throw SyntaxError("Uniplemented operation", xs.front());
+  }
+
+  return std::make_shared<ASTBoolean>(false);
+}
+
+std::shared_ptr<AST>
+Interpreter::evalIntCmp(const AST::List &ls,
+                        std::function<bool(const int &, const int &)> cmp) {
+  const auto ys = getEvaledArgs(ls);
+  requireIntType(ys.front());
+  const auto res = applyOp<ASTInt>(ys, cmp);
+  return std::make_shared<ASTBoolean>(res);
+}
+
+AST::List Interpreter::getEvaledArgs(const AST::List xs) {
+  if (xs.size() < 3)
+    throw SyntaxError("Expected operators for operator", xs.front());
+
+  AST::List ys;
+  for (unsigned int i = 1; i < xs.size(); i++) {
+    ys.emplace_back(eval(xs[i]));
+  }
+  if (!std::all_of(std::cbegin(ys), std::cend(ys),
+                   [type = ys.front()->type()](const auto &y) {
+                     return type == y->type();
+                   })) {
+    throw SyntaxError("All arguments must be of same type", xs.front());
+  }
+  return ys;
 }
 
 std::shared_ptr<AST> Interpreter::evalDefine(const std::shared_ptr<AST> &node) {

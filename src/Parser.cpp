@@ -66,6 +66,11 @@ void Parser::checkSyntaxForBuiltin(AST::List ls) const {
   if (!first)
     throw SyntaxError("Expected builtin", ls.front());
   switch (first->op()) {
+  case Builtin::EQ:
+  case Builtin::GT:
+  case Builtin::GE:
+  case Builtin::LT:
+  case Builtin::LE:
   case Builtin::ADD:
   case Builtin::SUB:
   case Builtin::DIV:

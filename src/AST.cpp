@@ -28,6 +28,17 @@ const char *builtinToCString(Builtin op) {
     return "pprint";
   case Builtin::IF:
     return "if";
+  case Builtin::EQ:
+    return "=";
+  case Builtin::GT:
+    return ">";
+  case Builtin::GE:
+    return ">=";
+  case Builtin::LT:
+    return "<";
+  case Builtin::LE:
+    return "<=";
+
   case Builtin::UNKNOWN:
     return "UNKNOWN";
   }
@@ -62,6 +73,17 @@ Builtin builtinFromCString(const char *str) {
     return Builtin::PPRINT;
   } else if (0 == strcmp("if", str)) {
     return Builtin::IF;
+  } else if (0 == strcmp("=", str)) {
+    return Builtin::EQ;
+  } else if (0 == strcmp(">", str)) {
+    return Builtin::GT;
+  } else if (0 == strcmp(">=", str)) {
+    return Builtin::GE;
+  } else if (0 == strcmp("<", str)) {
+    return Builtin::LT;
+  } else if (0 == strcmp("<=", str)) {
+    return Builtin::LE;
   }
+
   return Builtin::UNKNOWN;
 }
