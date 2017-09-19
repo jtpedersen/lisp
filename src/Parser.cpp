@@ -41,6 +41,12 @@ std::shared_ptr<AST> Parser::readExpr() {
     if (Builtin::UNKNOWN != op) {
       return std::make_shared<ASTBuiltin>(op);
     }
+    if (0 == strcmp("true", name)) {
+      return std::make_shared<ASTBoolean>(true);
+    } else if (0 == strcmp("false", name)) {
+      return std::make_shared<ASTBoolean>(false);
+    }
+
     return std::make_shared<ASTSymbol>(name);
   } else if (TokenType::INTEGER == tokenType) {
     return std::make_shared<ASTInt>(lexer.integer());

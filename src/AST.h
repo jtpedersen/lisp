@@ -28,7 +28,8 @@ Builtin builtinFromCString(const char *str);
 class AST {
 public:
   using List = std::vector<std::shared_ptr<AST>>;
-  enum class Type { SEXPR, SYMBOL, INTEGER, STRING, BUILTIN, FUN };
+  // TODO: move to Atom
+  enum class Type { SEXPR, SYMBOL, INTEGER, STRING, BOOLEAN, BUILTIN, FUN };
 
   explicit AST(Type type) : type_(type) {}
   virtual ~AST(){};
@@ -56,6 +57,8 @@ public:
       return "INTEGER";
     case Type::STRING:
       return "STRING";
+    case Type::BOOLEAN:
+      return "BOOLEAN";
     case Type::BUILTIN:
       return "BUILTIN";
     case Type::FUN:
@@ -88,12 +91,23 @@ protected:
   DataType data_;
 };
 
+// TODO: toString leaks
 class ASTInt : public ASTDataNode<int, AST::Type::INTEGER> {
 public:
   explicit ASTInt(int data) : ASTDataNode(data){};
   const char *toString() override {
     char buf[1024];
     snprintf(buf, 1024, "%d", data());
+    return strdup(buf);
+  }
+};
+
+class ASTBoolean : public ASTDataNode<bool, AST::Type::BOOLEAN> {
+public:
+  explicit ASTBoolean(bool data) : ASTDataNode(data){};
+  const char *toString() override {
+    char buf[1024];
+    snprintf(buf, 1024, "%s", data() ? "true": "false");
     return strdup(buf);
   }
 };

@@ -35,6 +35,7 @@ void print(const std::shared_ptr<AST> &node) {
     break;
   }
   case Type::SYMBOL:
+  case Type::BOOLEAN:
   case Type::INTEGER:
   case Type::STRING:
   case Type::BUILTIN:

@@ -115,7 +115,15 @@ std::shared_ptr<AST> Interpreter::evalJoin(const std::shared_ptr<AST> &opnode,
 
 std::shared_ptr<AST> Interpreter::evalIf(const AST::List &ls) {
   const auto res = eval(ls[1]);
-  if (0 != std::static_pointer_cast<ASTInt>(res)->data()) {
+  const auto isTrue = [ type = res->type(), &res ] {
+    if (AST::Type::BOOLEAN == res->type()) {
+      return std::static_pointer_cast<ASTBoolean>(res)->data();
+    }
+    return 0 != std::static_pointer_cast<ASTInt>(res)->data();
+  }
+  ();
+
+  if (isTrue) {
     return eval(ls[2]);
   } else {
     return eval(ls[3]);
