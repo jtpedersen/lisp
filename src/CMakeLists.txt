@@ -12,6 +12,7 @@ add_library(
   SyntaxError.cpp
   AST.cpp
   Environment.cpp
+  StopWatch.cpp
   )
 
 add_executable(

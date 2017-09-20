@@ -384,6 +384,15 @@ TEST_F(InterpreterTest, ifPrimitiveTrue) {
   EXPECT_STREQ(str->data(), "true");
 }
 
+TEST_F(InterpreterTest, ifConstant) {
+  load("(if true \"true\" \"false\")");
+  const auto res = eval();
+  ASSERT_NE(nullptr, res);
+  const auto str = std::static_pointer_cast<ASTString>(res);
+  EXPECT_STREQ(str->data(), "true");
+}
+
+
 TEST_F(InterpreterTest, eqFalseString) {
   load("(= \"true\" \"false\")");
   const auto res = eval();
