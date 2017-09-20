@@ -12,7 +12,8 @@ Interpreter::Interpreter() : env(std::make_shared<Environment>()) {}
 static void showNode(const char *prefix, const std::shared_ptr<AST> &node) {
 #if 0
   std::cout << prefix;
-  util::print(node);
+  if(node)
+    util::print(node);
   std::cout << std::endl;
 #endif
 }
@@ -41,12 +42,14 @@ std::shared_ptr<AST> Interpreter::eval(std::shared_ptr<AST> node) {
     const auto arglist = op->children()[1];
     showNode("ArgList: ", arglist);
     showNode("Call: ", node);
-    env = std::make_shared<Environment>(env);
+    auto newEnv = std::make_shared<Environment>();
     for (unsigned int i = 1; i < arglist->children().size(); i++) {
-      env->setEntry(symbolName(arglist->children()[i]),
-                    eval(node->children()[i]));
+      newEnv->setEntry(symbolName(arglist->children()[i]),
+                       eval(node->children()[i]));
     }
-    //    env->dump();
+    //    newEnv->dump();
+    newEnv->setParent(env);
+    env = newEnv;
     const auto res = eval(op->children()[2]);
     env = env->parent();
     return res;

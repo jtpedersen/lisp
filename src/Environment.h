@@ -15,6 +15,7 @@ public:
   std::shared_ptr<AST> operator[](const char *symbol);
 
   std::shared_ptr<Environment> parent() const;
+  void  setParent(std::shared_ptr<Environment> o);
 
   void dump() const;
 

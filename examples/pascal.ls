@@ -44,6 +44,11 @@
 (sum-n 10)
 (rec-sum 10)
 
+(define (fib x)
+  (if (< x 2)
+      x
+    (+ (fib (- x 1)) (fib (- x 2)))))
+
 (define (fib-iter a b count)
   (if (= count 0)
       b
@@ -52,5 +57,9 @@
 (define (fib2 n)
   (fib-iter 1 0 n))
 
-(fib2 3)
-(fib2 20)
+(fib2 1)
+(fib 1)
+(fib2 2)
+(fib 2)
+(fib2 13)
+(fib 13)

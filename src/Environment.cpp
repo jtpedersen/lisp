@@ -32,9 +32,12 @@ std::shared_ptr<AST> Environment::operator[](const char *symbol) {
 
 std::shared_ptr<Environment> Environment::parent() const { return parent_; }
 
+void Environment::setParent(std::shared_ptr<Environment> o) { parent_ = o; }
 
 void Environment::dump() const {
+  std::cout << "---------Environment dump-------------" << std::endl;
   for (const auto e : env) {
     std::cout << e.first << ": " << e.second->toString() << std::endl;
   }
+  std::cout << "--------------------------------------" << std::endl;
 }
