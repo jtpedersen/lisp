@@ -5,111 +5,92 @@
 #include "SyntaxError.h"
 #include "Util.h"
 
-TEST(parser, minimal) {
-  Lexer l("()");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+class ParserTest : public ::testing::Test {
+
+protected:
+  std::shared_ptr<AST> readFirst(const char *code) {
+    Lexer l(code);
+    Parser p(l);
+    const auto program = p.read();
+    EXPECT_GT(program.size(), 0);
+    EXPECT_NE(nullptr, program[0]);
+    return program[0];
+  }
+};
+
+TEST_F(ParserTest, minimal) {
+  const auto ast = readFirst("()");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   EXPECT_EQ(ast->children().size(), 0);
 }
 
-TEST(parser, symbol) {
-  Lexer l("hest");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, symbol) {
+  const auto ast = readFirst("hest");
   ASSERT_EQ(AST::Type::SYMBOL, ast->type());
   ASSERT_EQ(ast->children().size(), 0);
 }
 
-TEST(parser, String) {
-  Lexer l("\"hest\"");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, String) {
+  const auto ast = readFirst("\"hest\"");
   ASSERT_EQ(AST::Type::STRING, ast->type());
   ASSERT_EQ(ast->children().size(), 0);
 }
 
-TEST(parser, singleSymbolChild) {
-  Lexer l("(hest)");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, singleSymbolChild) {
+  const auto ast = readFirst("(hest)");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_EQ(ast->children().size(), 1);
   EXPECT_EQ(AST::Type::SYMBOL, (*ast)[0]->type()) << (*ast)[0]->type();
 }
 
-TEST(parser, singleIntegerChild) {
-  Lexer l("( 2)");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, singleIntegerChild) {
+  const auto ast = readFirst("( 2)");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_EQ(ast->children().size(), 1);
   EXPECT_EQ(AST::Type::INTEGER, (*ast)[0]->type()) << (*ast)[0]->type();
 }
 
-TEST(parser, symbolAndInteger) {
-  Lexer l("( hest 12 )");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, symbolAndInteger) {
+  const auto ast = readFirst("( hest 12 )");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_EQ(ast->children().size(), 2);
   EXPECT_EQ(AST::Type::SYMBOL, (*ast)[0]->type()) << (*ast)[0]->type();
   EXPECT_EQ(AST::Type::INTEGER, (*ast)[1]->type()) << (*ast)[1]->type();
 }
 
-TEST(parser, booleanTrue) {
-  Lexer l("true");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, booleanTrue) {
+  const auto ast = readFirst("true");
   EXPECT_EQ(AST::Type::BOOLEAN, ast->type());
 }
 
-TEST(parser, booleanFalse) {
-  Lexer l("false");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, booleanFalse) {
+  const auto ast = readFirst("false");
   EXPECT_EQ(AST::Type::BOOLEAN, ast->type());
 }
 
-TEST(parser, nestedSexpr) {
-  Lexer l("( () () )");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, nestedSexpr) {
+  const auto ast = readFirst("( () () )");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_EQ(ast->children().size(), 2);
   EXPECT_EQ(AST::Type::SEXPR, (*ast)[0]->type()) << (*ast)[0]->type();
   EXPECT_EQ(AST::Type::SEXPR, (*ast)[1]->type()) << (*ast)[1]->type();
 }
 
-TEST(parser, multinestedSexpr) {
-  Lexer l("(((())))");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, multinestedSexpr) {
+  const auto ast = readFirst("(((())))");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_EQ(ast->children().size(), 1);
   EXPECT_EQ(AST::Type::SEXPR, (*ast)[0]->type()) << (*ast)[0]->type();
 }
 
-TEST(parser, unbalanced) {
+TEST_F(ParserTest, unbalanced) {
   Lexer l("(((()))");
   Parser p(l);
   ASSERT_THROW(p.read(), SyntaxError);
 }
 
-TEST(parser, builtinAdd) {
-  Lexer l("(+ 1 2)");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, builtinAdd) {
+  const auto ast = readFirst("(+ 1 2)");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_EQ(3, ast->children().size());
   const auto first = ast->children()[0];
@@ -118,10 +99,8 @@ TEST(parser, builtinAdd) {
   EXPECT_EQ(Builtin::ADD, node->op()) << builtinToCString(node->op());
 }
 
-TEST(parser, builtinSub) {
-  Lexer l("(- 1 2)");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, builtinSub) {
+  const auto ast = readFirst("(- 1 2)");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_EQ(3, ast->children().size());
   const auto first = ast->children()[0];
@@ -130,10 +109,8 @@ TEST(parser, builtinSub) {
   EXPECT_EQ(Builtin::SUB, node->op()) << builtinToCString(node->op());
 }
 
-TEST(parser, builtinDiv) {
-  Lexer l("(/ 10 10)");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, builtinDiv) {
+  const auto ast = readFirst("(/ 10 10)");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_EQ(3, ast->children().size());
   const auto first = ast->children()[0];
@@ -142,10 +119,8 @@ TEST(parser, builtinDiv) {
   EXPECT_EQ(Builtin::DIV, node->op()) << builtinToCString(node->op());
 }
 
-TEST(parser, builtinMul) {
-  Lexer l("(* 0 0)");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, builtinMul) {
+  const auto ast = readFirst("(* 0 0)");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_EQ(3, ast->children().size());
   const auto first = ast->children()[0];
@@ -154,54 +129,42 @@ TEST(parser, builtinMul) {
   EXPECT_EQ(Builtin::MUL, node->op()) << builtinToCString(node->op());
 }
 
-TEST(parser, builtinArgs) {
-  Lexer l("(* 1 2 3)");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, builtinArgs) {
+  const auto ast = readFirst("(* 1 2 3)");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_EQ(4, ast->children().size());
 }
 
-TEST(parser, toStringInteger) {
-  Lexer l("12");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, toStringInteger) {
+  const auto ast = readFirst("12");
   EXPECT_STREQ("12", ast->toString());
 }
 
-TEST(parser, toStringSymbol) {
-  Lexer l("hest");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, toStringSymbol) {
+  const auto ast = readFirst("hest");
   EXPECT_STREQ("hest", ast->toString());
 }
 
-TEST(parser, toStringString) {
-  Lexer l("\"hest\"");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, toStringString) {
+  const auto ast = readFirst("\"hest\"");
   EXPECT_STREQ("\"hest\"", ast->toString());
 }
 
-TEST(parser, listBuiltin) {
-  Lexer l("(list a b c)");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, listBuiltin) {
+  const auto ast = readFirst("(list a b c)");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_TRUE(ast->head()->isBuiltin(Builtin::LIST));
   ASSERT_EQ(4, ast->children().size());
 }
 
-TEST(parser, headBuiltin) {
-  Lexer l("(head (list a))");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, headBuiltin) {
+  const auto ast = readFirst("(head (list a))");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_TRUE(ast->head()->isBuiltin(Builtin::HEAD));
   ASSERT_EQ(2, ast->children().size());
 }
 
-TEST(parser, headNeepsOperands) {
+TEST_F(ParserTest, headNeepsOperands) {
   Lexer l("(head)");
   Parser p(l);
   try {
@@ -215,16 +178,14 @@ TEST(parser, headNeepsOperands) {
   }
 }
 
-TEST(parser, tailBuiltin) {
-  Lexer l("(tail (list a))");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, tailBuiltin) {
+  const auto ast = readFirst("(tail (list a))");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_TRUE(ast->head()->isBuiltin(Builtin::TAIL));
   ASSERT_EQ(2, ast->children().size());
 }
 
-TEST(parser, tailNeepsOperands) {
+TEST_F(ParserTest, tailNeepsOperands) {
   Lexer l("(tail)");
   Parser p(l);
   try {
@@ -238,16 +199,14 @@ TEST(parser, tailNeepsOperands) {
   }
 }
 
-TEST(parser, joinBuiltin) {
-  Lexer l("(join (list a) (list b))");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, joinBuiltin) {
+  const auto ast = readFirst("(join (list a) (list b))");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_TRUE(ast->head()->isBuiltin(Builtin::JOIN));
   ASSERT_EQ(3, ast->children().size());
 }
 
-TEST(parser, joinNeedsOperands) {
+TEST_F(ParserTest, joinNeedsOperands) {
   Lexer l("(join)");
   Parser p(l);
   try {
@@ -261,7 +220,7 @@ TEST(parser, joinNeedsOperands) {
   }
 }
 
-TEST(parser, joinNeedsMoreThanOneOperand) {
+TEST_F(ParserTest, joinNeedsMoreThanOneOperand) {
   Lexer l("(join (list a))");
   Parser p(l);
   try {
@@ -275,42 +234,34 @@ TEST(parser, joinNeedsMoreThanOneOperand) {
   }
 }
 
-TEST(parser, evalBuiltin) {
-  Lexer l("(eval (list + 1 2))");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, evalBuiltin) {
+  const auto ast = readFirst("(eval (list + 1 2))");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_TRUE(ast->head()->isBuiltin(Builtin::EVAL));
   ASSERT_EQ(2, ast->children().size());
 }
 
-TEST(parser, pprintBuiltin) {
-  Lexer l("(pprint 2)");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, pprintBuiltin) {
+  const auto ast = readFirst("(pprint 2)");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_TRUE(ast->head()->isBuiltin(Builtin::PPRINT));
   ASSERT_EQ(2, ast->children().size());
 }
 
-TEST(parser, defineBuiltin) {
-  Lexer l("(define x 2)");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, defineBuiltin) {
+  const auto ast = readFirst("(define x 2)");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE));
   ASSERT_EQ(3, ast->children().size());
 }
 
-TEST(parser, defineSexpr) {
-  Lexer l("(define y () )");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, defineSexpr) {
+  const auto ast = readFirst("(define y () )");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE));
 }
 
-TEST(parser, defineMustHaveName) {
+TEST_F(ParserTest, defineMustHaveName) {
   Lexer l("(define )");
   Parser p(l);
   try {
@@ -322,7 +273,7 @@ TEST(parser, defineMustHaveName) {
   }
 }
 
-TEST(parser, defineMustHaveBody) {
+TEST_F(ParserTest, defineMustHaveBody) {
   Lexer l("(define (name) )");
   Parser p(l);
   try {
@@ -334,7 +285,7 @@ TEST(parser, defineMustHaveBody) {
   }
 }
 
-TEST(parser, defineVarMustHaveBody) {
+TEST_F(ParserTest, defineVarMustHaveBody) {
   Lexer l("(define x )");
   Parser p(l);
   try {
@@ -346,34 +297,27 @@ TEST(parser, defineVarMustHaveBody) {
   }
 }
 
-TEST(parser, defineFunSexpr) {
-  Lexer l("(define (name) (+ 1 2) )");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, defineFunSexpr) {
+  const auto ast = readFirst("(define (name) (+ 1 2) )");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE))
       << ast->head()->toString();
 }
 
-TEST(parser, defineFunSexprWithArgs) {
-  Lexer l("(define (name x y) (* x y) )");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, defineFunSexprWithArgs) {
+  const auto ast = readFirst("(define (name x y) (* x y) )");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
   ASSERT_TRUE(ast->head()->isBuiltin(Builtin::DEFINE))
       << ast->head()->toString();
 }
 
-TEST(parser, defineIf) {
-  Lexer l("(if (predicate) (yes) (no) )");
-  Parser p(l);
-  const auto ast = p.read();
+TEST_F(ParserTest, defineIf) {
+  const auto ast = readFirst("(if (predicate) (yes) (no) )");
   ASSERT_EQ(AST::Type::SEXPR, ast->type());
-  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::IF))
-      << ast->head()->toString();
+  ASSERT_TRUE(ast->head()->isBuiltin(Builtin::IF)) << ast->head()->toString();
 }
 
-TEST(parser, ifMustHaveCondBranches) {
+TEST_F(ParserTest, ifMustHaveCondBranches) {
   Lexer l("(if )");
   Parser p(l);
   try {
@@ -385,53 +329,30 @@ TEST(parser, ifMustHaveCondBranches) {
   }
 }
 
-TEST(parser, operatorEq) {
-  Lexer l("=");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, operatorEq) {
+  const auto ast = readFirst("=");
   ASSERT_TRUE(ast->isBuiltin(Builtin::EQ));
 }
 
-TEST(parser, operatorGT) {
-  Lexer l(">");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, operatorGT) {
+  const auto ast = readFirst(">");
   ASSERT_TRUE(ast->isBuiltin(Builtin::GT));
 }
 
-
-TEST(parser, operatorGE) {
-  Lexer l(">=");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, operatorGE) {
+  const auto ast = readFirst(">=");
   ASSERT_TRUE(ast->isBuiltin(Builtin::GE));
 }
 
-
-TEST(parser, operatorLT) {
-  Lexer l("<");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, operatorLT) {
+  const auto ast = readFirst("<");
   ASSERT_TRUE(ast->isBuiltin(Builtin::LT));
 }
 
-
-TEST(parser, operatorLE) {
-  Lexer l("<=");
-  Parser p(l);
-  const auto ast = p.read();
-  ASSERT_NE(ast, nullptr);
+TEST_F(ParserTest, operatorLE) {
+  const auto ast = readFirst("<=");
   ASSERT_TRUE(ast->isBuiltin(Builtin::LE));
 }
-
-
-
-
-
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

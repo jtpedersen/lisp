@@ -13,7 +13,10 @@ protected:
   void load(const char *code) {
     Lexer l(code);
     Parser p(l);
-    program = p.read();
+    const auto tmp = p.read();
+    EXPECT_GT(tmp.size(), 0);
+    EXPECT_NE(nullptr, tmp[0]);
+    program =  tmp[0];
   }
 
   std::shared_ptr<AST> eval() { return interpreter.eval(program); }

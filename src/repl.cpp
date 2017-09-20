@@ -27,9 +27,11 @@ int runFile(const char *fileName) {
     Lexer l(buffer);
     Parser p(l);
     const auto program = p.read();
-    util::print(program);
-    cout << "\n";
-    cout << interpreter.eval(program)->toString() << endl;
+    for (const auto &e : program) {
+      util::print(e);
+      cout << "\n";
+      cout << interpreter.eval(e)->toString() << endl;
+    }
   } catch (const exception &e) {
     cout << "Error occurred: " << e.what() << endl;
     cout << "\n" << PROMPT;
@@ -52,10 +54,12 @@ int main(int argc, char *argv[]) {
       Lexer l(line.c_str());
       Parser p(l);
       const auto program = p.read();
-      util::print(program);
-      cout << "\n";
-      cout << "\t" << interpreter.eval(program)->toString() << endl;
-      cout << "\n" << PROMPT;
+      for (const auto &e : program) {
+        util::print(e);
+        cout << "\n";
+        cout << "\t" << interpreter.eval(e)->toString() << endl;
+        cout << "\n" << PROMPT;
+      }
     } catch (const exception &e) {
       cout << "Error occurred: " << e.what() << endl;
       cout << "\n" << PROMPT;

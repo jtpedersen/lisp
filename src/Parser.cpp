@@ -9,9 +9,15 @@
 
 using TokenType = Lexer::TokenType;
 
-Parser::Parser(const Lexer &lexer) : lexer(lexer) {}
+Parser::Parser(const Lexer &lexer) : lexer(lexer), depth(0) {}
 
-std::shared_ptr<AST> Parser::read() { return readExpr(); }
+AST::List Parser::read() {
+  AST::List res;
+  while (const auto e = readExpr()) {
+    res.emplace_back(e);
+  }
+  return res;
+}
 
 std::shared_ptr<AST> Parser::readSexpr() {
   AST::List ls;
@@ -53,13 +59,14 @@ std::shared_ptr<AST> Parser::readExpr() {
   } else if (TokenType::STRING == tokenType) {
     return std::make_shared<ASTString>(lexer.string());
   } else if (TokenType::START_PAREN == tokenType) {
+    depth++;
     return readSexpr();
   } else if (TokenType::END_PAREN == tokenType) {
+    depth--;
+    return nullptr;
+  } else if (0 == depth && TokenType::TOKEN_EOF == tokenType) {
     return nullptr;
   }
-  // } else if (TokenType::TOKEN_EOF == tokenType) {
-  //   return nullptr;
-  // }
   syntaxError("Expected expression");
   return nullptr; // to please the compiler
 }

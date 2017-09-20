@@ -9,10 +9,11 @@ class Parser {
 public:
   explicit Parser(const Lexer &lexer);
 
-  std::shared_ptr<AST> read();
+  AST::List read();
 
 private:
   Lexer lexer;
+  int depth;
   void checkSyntaxForBuiltin(AST::List ls) const;
   void syntaxError(const char *msg);
   std::shared_ptr<AST> readSexpr();
