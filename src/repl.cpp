@@ -21,14 +21,14 @@ void printEvaluation(const char *code) {
   for (const auto &e : program) {
     util::print(e);
   }
-  cout << "\n(parse " << parseTime.elapsed() << "ms )" << std::endl;
+  cout << "\n(parse " << parseTime.elapsed() << " ms)" << std::endl;
   for (const auto &e : program) {
     util::print(e);
     cout << "\n";
     StopWatch evalTime;
     cout << interpreter.eval(e)->toString();
     evalTime.stop();
-    cout << "\t\t\t(eval " << evalTime.elapsed() << "ms)" << endl;
+    cout << "\t\t\t(eval " << evalTime.elapsed() << " ms)" << endl;
   }
 }
 
