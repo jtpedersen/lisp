@@ -3,6 +3,8 @@
 
 #include <cassert>
 #include <iostream>
+#include <algorithm>
+#include <iterator>
 
 Environment::Environment(std::shared_ptr<Environment> parent)
     : parent_(parent) {}
@@ -28,6 +30,13 @@ std::shared_ptr<AST> Environment::operator[](const char *symbol) {
   if (parent_)
     return (*parent_)[symbol];
   return nullptr;
+}
+
+std::vector<std::string> Environment::symbols() {
+  auto res = std::vector<std::string>();
+  std::transform(env.cbegin(), env.cend(), std::back_inserter(res),
+                 [] (const auto e) -> std::string { return  std::string(e.first);});
+  return res;
 }
 
 std::shared_ptr<Environment> Environment::parent() const { return parent_; }

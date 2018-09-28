@@ -6,6 +6,7 @@
 #include <cstring>
 #include <map>
 #include <memory>
+#include <vector>
 
 class Environment {
 public:
@@ -13,9 +14,10 @@ public:
   ~Environment();
   void setEntry(const char *symbol, std::shared_ptr<AST> node);
   std::shared_ptr<AST> operator[](const char *symbol);
+  std::vector<std::string> symbols();
 
   std::shared_ptr<Environment> parent() const;
-  void  setParent(std::shared_ptr<Environment> o);
+  void setParent(std::shared_ptr<Environment> o);
 
   void dump() const;
 

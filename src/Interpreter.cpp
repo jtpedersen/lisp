@@ -18,6 +18,10 @@ static void showNode(const char *prefix, const std::shared_ptr<AST> &node) {
 #endif
 }
 
+const std::shared_ptr<Environment> Interpreter::environment() const {
+  return env;
+}
+
 std::shared_ptr<AST> Interpreter::eval(std::shared_ptr<AST> node) {
   showNode("EVAL: ", node);
   if (node->children().size() == 0) {

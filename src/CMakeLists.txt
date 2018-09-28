@@ -21,6 +21,7 @@ add_executable(
   )
 
 target_link_libraries(repl lisp)
+target_link_libraries(repl replxx)
 
 add_executable(
   shader

@@ -10,6 +10,7 @@ public:
   Interpreter();
   std::shared_ptr<AST> eval(std::shared_ptr<AST> node);
 
+  const std::shared_ptr<Environment> environment() const;
 private:
   std::shared_ptr<AST> evalBuiltin(std::shared_ptr<AST> node);
 
