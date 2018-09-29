@@ -1,0 +1,27 @@
+* A toy lisp implementation in c++
+
+The idea initially hatched as a way to script shaders, somewhere along the way it diverged.
+
+** Building
+
+#+BEGIN_SRC bash
+user:~project$ mkdir build
+user:~project$ cd build
+user:~project/ build$ cmake ../ -G Ninja
+user:~project/ build$ ninja
+#+END_SRC
+
+
+** Running
+
+ #+BEGIN_SRC bash
+user:~project/build$ ./src/repl
+lispy> (define (fun a b) (+ a b))
+ #+END_SRC
+
+
+
+** Run unit tests
+#+BEGIN_SRC 
+user:~project/build$./test/interpreter
+#+END_SRC
