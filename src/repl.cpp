@@ -1,9 +1,9 @@
+#include "Environment.h"
 #include "Interpreter.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "StopWatch.h"
 #include "Util.h"
-#include "Environment.h"
 
 #include "replxx.hxx"
 #include <regex>
@@ -11,7 +11,6 @@ using Replxx = replxx::Replxx;
 
 // the path to the history file
 std::string history_file{"./replxx_history.txt"};
-
 
 #include <fstream>
 #include <iostream>
@@ -75,10 +74,8 @@ Replxx::completions_t hook_completion(std::string const &context, int index,
                                       void *user_data) {
   const auto symbols = interpreter.environment()->symbols();
   Replxx::completions_t completions;
-  std::string prefix{context.substr(index)};
-  if (index > 1 && context[0] == '(')
-    prefix = prefix.substr(1);
-  for (const auto& e : symbols) {
+  const auto prefix = util::zap_to_lparen(context, index);
+  for (const auto &e : symbols) {
     if (e.compare(0, prefix.size(), prefix) == 0) {
       completions.emplace_back(e.c_str());
     }
@@ -89,14 +86,14 @@ Replxx::completions_t hook_completion(std::string const &context, int index,
 
 Replxx::hints_t hook_hint(std::string const &context, int index,
                           Replxx::Color &color, void *user_data) {
-  auto *examples = static_cast<std::vector<std::string> *>(user_data);
+  const auto symbols = interpreter.environment()->symbols();
+
   Replxx::hints_t hints;
 
-  // only show hint if prefix is at least 'n' chars long
-  // or if prefix begins with a specific character
-  std::string prefix{context.substr(index)};
+  const auto prefix = util::zap_to_lparen(context, index);
+
   if (prefix.size() >= 2 || (!prefix.empty() && prefix.at(0) == '.')) {
-    for (auto const &e : *examples) {
+    for (auto const &e : symbols) {
       if (e.compare(0, prefix.size(), prefix) == 0) {
         hints.emplace_back(e.substr(prefix.size()).c_str());
       }
@@ -257,8 +254,7 @@ Replxx init_replxx() {
   Replxx rx;
   rx.install_window_change_handler();
 
-
-  //l oad the history file if it exists
+  // l oad the history file if it exists
   rx.history_load(history_file);
 
   // set the max history size
@@ -273,7 +269,7 @@ Replxx init_replxx() {
   // set the callbacks
 
   // rx.set_highlighter_callback(hook_color, static_cast<void *>(&regex_color));
-  // 
+  //
 
   return rx;
 }
@@ -285,8 +281,8 @@ int main(int argc, char *argv[]) {
 
   auto rx = init_replxx();
   rx.set_completion_callback(hook_completion, nullptr);
-  // rx.set_hint_callback(hook_completion, nullptr);
-  
+  rx.set_hint_callback(hook_hint, nullptr);
+
   // set the repl prompt
   std::string prompt{"\x1b[1;32mlispy\x1b[0m> "};
 
@@ -319,8 +315,8 @@ int main(int argc, char *argv[]) {
     }
   }
 
-	// save the history
-	rx.history_save(history_file);
+  // save the history
+  rx.history_save(history_file);
 
   return 0;
 }

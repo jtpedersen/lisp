@@ -14,13 +14,16 @@ std::vector<Lexer::TokenType> tokenizeFile(std::string file);
 
 void print(const std::shared_ptr<AST> &node);
 void printList(const AST::List &ls);
-}
+
+std::string zap_to_lparen(const std::string &data, const int index);
+
+} // namespace util
 
 namespace std {
 
 ostream &operator<<(ostream &os, const Lexer::TokenType &t);
 ostream &operator<<(ostream &os, const AST::Type &t);
 
-} // std
+} // namespace std
 
 #endif /* !SHADER_UTIL_H_ */

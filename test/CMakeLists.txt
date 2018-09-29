@@ -17,3 +17,6 @@ target_link_libraries(parser lisp)
 
 TESTCASE(interpreter Interpreter.cpp)
 target_link_libraries(interpreter lisp)
+
+TESTCASE(repl_test repl.cpp)
+target_link_libraries(repl_test lisp)

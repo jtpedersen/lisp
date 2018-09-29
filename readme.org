@@ -4,11 +4,12 @@ The idea initially hatched as a way to script shaders, somewhere along the way i
 
 ** Building
 
+
 #+BEGIN_SRC bash
 user:~project$ mkdir build
 user:~project$ cd build
-user:~project/ build$ cmake ../ -G Ninja
-user:~project/ build$ ninja
+user:~project/build$ cmake ../ -G Ninja
+user:~project/build$ ninja
 #+END_SRC
 
 
