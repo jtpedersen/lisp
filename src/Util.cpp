@@ -64,12 +64,13 @@ void printList(const AST::List &ls) {
 
 std::string zap_to_lparen(const std::string &data, const int index) {
   const auto idx = [&] {
-    for (int i = std::max(0, index - 1); i < static_cast<int>(data.length());
-         i++) {
+    const auto start = std::max(0, index - 1);
+    const auto end = static_cast<int>(data.length());
+    for (int i = start; i < end; i++) {
       if (data[i] == '(')
         return i + 1;
     }
-    return std::max(0, index - 1);
+    return start;
   }();
   return data.substr(idx);
 }
