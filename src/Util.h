@@ -15,7 +15,7 @@ std::vector<Lexer::TokenType> tokenizeFile(std::string file);
 void print(const std::shared_ptr<AST> &node);
 void printList(const AST::List &ls);
 
-std::string zap_to_lparen(const std::string &data, const int index);
+std::string zap_to_keyword(const std::string &data, const int index);
 
 } // namespace util
 

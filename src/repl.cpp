@@ -74,7 +74,7 @@ Replxx::completions_t hook_completion(std::string const &context, int index,
                                       void *user_data) {
   const auto symbols = interpreter.environment()->symbols();
   Replxx::completions_t completions;
-  const auto prefix = util::zap_to_lparen(context, index);
+  const auto prefix = util::zap_to_keyword(context, index);
   for (const auto &e : symbols) {
     if (e.compare(0, prefix.size(), prefix) == 0) {
       completions.emplace_back(e.c_str());
@@ -90,7 +90,7 @@ Replxx::hints_t hook_hint(std::string const &context, int index,
 
   Replxx::hints_t hints;
 
-  const auto prefix = util::zap_to_lparen(context, index);
+  const auto prefix = util::zap_to_keyword(context, index);
 
   if (prefix.size() >= 2 || (!prefix.empty() && prefix.at(0) == '.')) {
     for (auto const &e : symbols) {

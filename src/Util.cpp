@@ -62,12 +62,13 @@ void printList(const AST::List &ls) {
   }
 }
 
-std::string zap_to_lparen(const std::string &data, const int index) {
+std::string zap_to_keyword(const std::string &data, const int index) {
   const auto idx = [&] {
     const auto start = std::max(0, index - 1);
     const auto end = static_cast<int>(data.length());
     for (int i = start; i < end; i++) {
-      if (data[i] == '(')
+      const auto & c = data[i] ;
+      if ( c== '(' || std::isspace(c))
         return i + 1;
     }
     return start;
